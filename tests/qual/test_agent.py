@@ -47,6 +47,7 @@ def test_qual_agent_run_returns_qual_output():
         agent = QualAgent(schema_path=SCHEMA_PATH, chroma_store=store, claude_client=claude)
         docs = [QualDoc(path=NAMA_DOC)]
         result = agent.run(docs=docs, quant_alerts=[])
+        store.close()
 
     assert result.sentiment == 0.7
     assert result.chunks_stored > 0
@@ -61,6 +62,7 @@ def test_qual_agent_run_with_no_docs_returns_empty_output():
         store = ChromaStore(persist_path=tmpdir, collection_name="test2", embedder=FakeEmbedder())
         agent = QualAgent(schema_path=SCHEMA_PATH, chroma_store=store, claude_client=claude)
         result = agent.run(docs=[], quant_alerts=[])
+        store.close()
 
     assert result.chunks_stored == 0
     assert result.hypotheses == []

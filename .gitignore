@@ -26,5 +26,4 @@ data/vector_store/
 # Tests
 tests/
 
-# Agent outputs
-data/outputs/
+# Agent outputs — tracked intentionally

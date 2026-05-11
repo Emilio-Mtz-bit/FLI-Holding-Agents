@@ -25,3 +25,6 @@ data/vector_store/
 
 # Tests
 tests/
+
+# Agent outputs
+data/outputs/

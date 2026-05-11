@@ -1,0 +1,17 @@
+client: nama
+signals:
+  - key: tipo_empresa
+    type: str
+  - key: posicionamiento
+    type: str
+  - key: fortalezas
+    type: list[str]
+  - key: riesgos
+    type: list[str]
+  - key: factores_crecimiento
+    type: list[str]
+  - key: temas_topicos
+    type: list[str]
+  - key: sentiment_score
+    type: float
+    range: [-1.0, 1.0]

@@ -1,0 +1,7 @@
+Del siguiente texto, extrae la frase o cita más representativa de la identidad,
+propuesta de valor o situación estratégica de la empresa.
+Devuelve ÚNICAMENTE la cita, sin comillas adicionales, sin explicación.
+Máximo 2 oraciones.
+
+Texto:
+{text}

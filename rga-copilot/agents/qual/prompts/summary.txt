@@ -1,0 +1,7 @@
+Basándote en las siguientes señales extraídas de documentos cualitativos de la empresa,
+escribe un párrafo ejecutivo conciso (3-5 oraciones) en español que describa el perfil
+de la empresa, sus fortalezas clave y sus principales riesgos.
+No inventes información. Usa únicamente los datos proporcionados.
+
+Señales:
+{signals_json}

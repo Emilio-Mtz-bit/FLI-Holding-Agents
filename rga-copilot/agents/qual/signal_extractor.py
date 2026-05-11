@@ -11,7 +11,8 @@ PROMPT_TEMPLATE = (Path(__file__).parent / "prompts" / "signal_extraction.txt").
 
 class SignalExtractor:
     def __init__(self, schema_path: str, claude_client):
-        self.schema = yaml.safe_load(open(schema_path, encoding="utf-8"))
+        with open(schema_path, encoding="utf-8") as f:
+            self.schema = yaml.safe_load(f)
         self.client = claude_client
 
     def _build_schema_keys(self) -> str:

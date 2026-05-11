@@ -22,3 +22,6 @@ data/processed/
 
 # Vector store
 data/vector_store/
+
+# Tests
+tests/

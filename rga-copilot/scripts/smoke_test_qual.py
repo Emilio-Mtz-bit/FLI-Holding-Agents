@@ -1,6 +1,10 @@
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+sys.stdout.reconfigure(encoding="utf-8")
+
+from dotenv import load_dotenv
+load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env"))
 
 from anthropic import Anthropic
 from agents.qual.models import QualDoc

@@ -32,7 +32,14 @@ class SignalExtractor:
                 max_tokens=1024,
                 messages=[{"role": "user", "content": prompt}],
             )
-            return json.loads(response.content[0].text)
+            raw = response.content[0].text.strip()
+            # Strip markdown code fences Claude sometimes adds
+            if raw.startswith("```"):
+                raw = raw.split("```", 2)[1]
+                if raw.startswith("json"):
+                    raw = raw[4:]
+                raw = raw.rsplit("```", 1)[0].strip()
+            return json.loads(raw)
         except json.JSONDecodeError:
             logger.warning("Claude returned malformed JSON during signal extraction.")
             return {}

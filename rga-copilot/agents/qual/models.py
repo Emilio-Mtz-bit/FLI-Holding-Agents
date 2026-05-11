@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Literal
+from typing import Any, Literal
 from pydantic import BaseModel, model_validator
 
 
@@ -43,7 +43,7 @@ class ProcessedDoc(BaseModel):
 
 
 class QualOutput(BaseModel):
-    signals: dict
+    signals: dict[str, Any]
     sentiment: float
     hypotheses: list[str] = []
     summary: str

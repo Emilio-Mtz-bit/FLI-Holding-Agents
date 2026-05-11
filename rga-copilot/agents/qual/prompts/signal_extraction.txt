@@ -1,0 +1,14 @@
+Analiza el siguiente texto empresarial y extrae las señales indicadas.
+Devuelve ÚNICAMENTE un objeto JSON válido con exactamente las siguientes claves:
+
+{schema_keys}
+
+Reglas:
+- Para claves de tipo list[str]: devuelve una lista de strings, mínimo 1 elemento.
+- Para claves de tipo float con rango [-1.0, 1.0]: devuelve un número decimal en ese rango.
+- Para claves de tipo str: devuelve una cadena de texto concisa.
+- No incluyas texto fuera del JSON.
+- No inventes información que no esté en el texto.
+
+Texto:
+{text}

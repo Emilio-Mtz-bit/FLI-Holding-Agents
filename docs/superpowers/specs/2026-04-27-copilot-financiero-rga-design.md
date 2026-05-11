@@ -111,7 +111,7 @@ def clean_bd(bd: pd.DataFrame) -> pd.DataFrame:
     # 5. Normalizar: montos en MXN, períodos etiquetados desde columna MES
 ```
 
-**Almacenamiento:** DuckDB local (`.duckdb` por cliente). Incremental: nuevos períodos se insertan con `INSERT OR IGNORE`.
+**Almacenamiento:** DB local (`.duckdb` por cliente). Incremental: nuevos períodos se insertan con `INSERT OR IGNORE`.
 
 **Modelos Pydantic de contrato entre módulos:**
 ```python

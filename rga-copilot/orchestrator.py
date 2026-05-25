@@ -124,4 +124,4 @@ def run_analysis(
     )
     synth = synth_agent.run(quant, qual)
 
-    return AnalysisResult.model_construct(period=period, quant=quant, qual=qual, synth=synth)
+    return AnalysisResult(period=period, quant=quant, qual=qual, synth=synth)

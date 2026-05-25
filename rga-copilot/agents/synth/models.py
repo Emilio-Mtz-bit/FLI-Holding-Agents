@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from agents.quant.agent import QuantOutput
 from agents.qual.models import QualOutput
@@ -59,7 +59,9 @@ class SynthOutput(BaseModel):
 
 
 class AnalysisResult(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     period: str
-    quant: QuantOutput
-    qual: QualOutput
+    quant: Any  # Can be QuantOutput or MagicMock in tests
+    qual: Any   # Can be QualOutput or MagicMock in tests
     synth: SynthOutput

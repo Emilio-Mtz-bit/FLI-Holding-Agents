@@ -61,6 +61,11 @@ class MemoGenerator:
 
     def write_pdf(self, html: str, *, out_dir: str, period: str) -> str:
         """Render html → PDF and return absolute file path."""
+        if HTML is None:
+            raise RuntimeError(
+                "WeasyPrint is unavailable (missing system cairo/gobject libs). "
+                "PDF generation is disabled. Set DYLD_LIBRARY_PATH=/opt/homebrew/lib on macOS."
+            )
         os.makedirs(out_dir, exist_ok=True)
         safe_period = re.sub(r"\s+", "_", period.upper())
         filename = f"memo_{safe_period}.pdf"

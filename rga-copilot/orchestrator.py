@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import logging
 import os
+from pathlib import Path
 
 import anthropic
 from dotenv import load_dotenv
@@ -74,6 +75,7 @@ def run_analysis(
     company: str = "Grupo Nama",
     chroma_persist_path: str = "data/vector_store",
     memo_out_dir: str = "data/outputs",
+    schema_path: str | None = None,
 ) -> AnalysisResult:
     """
     Full analysis pipeline.
@@ -90,6 +92,9 @@ def run_analysis(
     Returns:
         AnalysisResult with quant, qual, and synth sub-results.
     """
+    if schema_path is None:
+        schema_path = str(Path(__file__).parent / "agents" / "qual" / "config" / "nama_signals.yaml")
+
     logger.info("Orchestrator: loading data for period=%s", period)
     raw = load(csv_path, xlsx_path)
     db  = clean(raw)
@@ -108,7 +113,7 @@ def run_analysis(
         embedder=embedder,
     )
     qual_agent = QualAgent(
-        schema_path="agents/qual/config/nama_signals.yaml",
+        schema_path=schema_path,
         chroma_store=chroma_store,
         claude_client=claude_client,
     )

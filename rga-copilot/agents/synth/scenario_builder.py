@@ -123,6 +123,11 @@ def build_default_scenarios(quant) -> list[Scenario]:
     cats = kpis["por_categoria"]
     branches = kpis["por_sucursal"]
 
+    if not cats:
+        raise ValueError("Cannot build scenarios: por_categoria is empty for this period.")
+    if not branches:
+        raise ValueError("Cannot build scenarios: por_sucursal is empty for this period.")
+
     # Scenario 1: highest-cost category
     highest_cost_cat = max(cats, key=lambda c: c["costo"])["categoria"]
     sc1 = build_scenario_costo_insumo(quant, categoria=highest_cost_cat, delta_pct=0.15)

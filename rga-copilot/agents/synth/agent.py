@@ -27,7 +27,6 @@ from agents.synth.scenario_builder import build_default_scenarios
 logger = logging.getLogger(__name__)
 
 _PROMPT_PATH = Path(__file__).parent / "prompts" / "signal_synthesis.txt"
-_PROMPT_TEMPLATE = _PROMPT_PATH.read_text(encoding="utf-8")
 
 
 class SynthAgent:
@@ -79,7 +78,14 @@ class SynthAgent:
     def _extract_signals(
         self, quant: QuantOutput, qual: QualOutput
     ) -> tuple[list[Signal], str]:
-        prompt = _PROMPT_TEMPLATE.format(
+        try:
+            prompt_template = _PROMPT_PATH.read_text(encoding="utf-8")
+        except FileNotFoundError:
+            raise FileNotFoundError(
+                f"Signal synthesis prompt not found at {_PROMPT_PATH}. "
+                "Ensure agents/synth/prompts/signal_synthesis.txt exists."
+            ) from None
+        prompt = prompt_template.format(
             company=self._company,
             period=quant.period,
             quant_json=json.dumps(
@@ -119,7 +125,11 @@ class SynthAgent:
             logger.error("Claude returned malformed JSON in signal extraction: %r", raw[:200])
             parsed = {"signals": [], "next_steps": ""}
 
-        signals = [Signal(**s) for s in parsed.get("signals", [])]
+        try:
+            signals = [Signal(**s) for s in parsed.get("signals", [])]
+        except Exception as exc:
+            logger.error("Signal validation failed — Claude output did not match schema: %s", exc)
+            signals = []
         next_steps = parsed.get("next_steps", "")
         return signals, next_steps
 

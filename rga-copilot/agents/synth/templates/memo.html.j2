@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Memo Ejecutivo — {{ period }}</title>
+<style>
+  body {
+    font-family: 'Arial', sans-serif;
+    font-size: 11pt;
+    max-width: 860px;
+    margin: auto;
+    padding: 40px 48px;
+    color: #1a1a1a;
+    line-height: 1.5;
+  }
+  h1 { color: #1a3c5e; font-size: 20pt; margin-bottom: 4px; }
+  .subtitle { color: #555; font-size: 10pt; margin-top: 0; margin-bottom: 24px; }
+  h2 {
+    color: #1a3c5e;
+    font-size: 13pt;
+    border-bottom: 2px solid #1a3c5e;
+    padding-bottom: 4px;
+    margin-top: 32px;
+  }
+  h3 { color: #2a5a8e; font-size: 11pt; margin-bottom: 4px; }
+  .signal-card {
+    border: 1px solid #2a5a8e;
+    border-left: 4px solid #2a5a8e;
+    border-radius: 4px;
+    padding: 14px 18px;
+    margin: 14px 0;
+    background: #f8fbff;
+  }
+  .signal-card.rank-1 { border-left-color: #c0392b; }
+  .signal-card.rank-2 { border-left-color: #d35400; }
+  .signal-card.rank-3 { border-left-color: #2a5a8e; }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 9pt;
+    font-weight: bold;
+    margin-right: 6px;
+  }
+  .badge-alto   { background: #c0392b; color: white; }
+  .badge-medio  { background: #d35400; color: white; }
+  .badge-bajo   { background: #7f8c8d; color: white; }
+  .badge-alta   { background: #27ae60; color: white; }
+  .badge-media  { background: #f39c12; color: white; }
+  .badge-baja   { background: #7f8c8d; color: white; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 10pt;
+  }
+  th {
+    background: #1a3c5e;
+    color: white;
+    padding: 8px 12px;
+    text-align: left;
+  }
+  td {
+    border: 1px solid #ddd;
+    padding: 7px 12px;
+    vertical-align: top;
+  }
+  tr:nth-child(even) td { background: #f5f5f5; }
+  .impact-pos { color: #27ae60; font-weight: bold; }
+  .impact-neg { color: #c0392b; font-weight: bold; }
+  .footer {
+    margin-top: 48px;
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
+    font-size: 8pt;
+    color: #888;
+  }
+  blockquote {
+    border-left: 3px solid #2a5a8e;
+    margin: 0;
+    padding: 8px 16px;
+    background: #f0f4f8;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<h1>Memo Ejecutivo Financiero</h1>
+<p class="subtitle">
+  <strong>Empresa:</strong> {{ company }} &nbsp;|&nbsp;
+  <strong>Período:</strong> {{ period }} &nbsp;|&nbsp;
+  <strong>Generado:</strong> {{ generated_date }}
+</p>
+
+<!-- ====================================================== -->
+<h2>1. Resumen del Período</h2>
+<p>{{ quant_narrative }}</p>
+
+{% if qual_summary %}
+<blockquote>{{ qual_summary }}</blockquote>
+{% endif %}
+
+<!-- ====================================================== -->
+<h2>2. Top 3 Señales Priorizadas</h2>
+
+{% for s in signals %}
+<div class="signal-card rank-{{ s.rank }}">
+  <h3>{{ s.rank }}. {{ s.titulo }}</h3>
+  <p><strong>Evidencia cuantitativa:</strong> {{ s.evidencia_quant }}</p>
+  <p><strong>Contexto cualitativo:</strong> {{ s.evidencia_qual }}</p>
+  <p><strong>Recomendación:</strong> {{ s.recomendacion }}</p>
+  <div>
+    Impacto: <span class="badge badge-{{ s.impacto }}">{{ s.impacto | upper }}</span>
+    Facilidad: <span class="badge badge-{{ s.facilidad }}">{{ s.facilidad | upper }}</span>
+  </div>
+</div>
+{% endfor %}
+
+<!-- ====================================================== -->
+<h2>3. Escenarios Simulados (What-If)</h2>
+<table>
+  <tr>
+    <th>Escenario</th>
+    <th>EBITDA Base (MXN)</th>
+    <th>Impacto (MXN)</th>
+    <th>EBITDA Post (MXN)</th>
+    <th>Variación</th>
+  </tr>
+  {% for sc in scenarios %}
+  {% set pct_change = (sc.impact_on_ebitda / sc.base_ebitda * 100) if sc.base_ebitda != 0 else 0 %}
+  <tr>
+    <td>{{ sc.name }}</td>
+    <td>${{ "{:,.0f}".format(sc.base_ebitda) }}</td>
+    <td class="{{ 'impact-pos' if sc.impact_on_ebitda >= 0 else 'impact-neg' }}">
+      {{ '+' if sc.impact_on_ebitda >= 0 else '' }}${{ "{:,.0f}".format(sc.impact_on_ebitda) }}
+    </td>
+    <td>${{ "{:,.0f}".format(sc.ebitda_post) }}</td>
+    <td class="{{ 'impact-pos' if pct_change >= 0 else 'impact-neg' }}">
+      {{ '+' if pct_change >= 0 else '' }}{{ "{:.1f}".format(pct_change) }}%
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+
+<!-- ====================================================== -->
+<h2>4. Recomendaciones Priorizadas</h2>
+<table>
+  <tr>
+    <th>#</th>
+    <th>Acción recomendada</th>
+    <th>Impacto</th>
+    <th>Facilidad</th>
+  </tr>
+  {% for r in recommendations %}
+  <tr>
+    <td>{{ loop.index }}</td>
+    <td>{{ r.accion }}</td>
+    <td><span class="badge badge-{{ r.impacto }}">{{ r.impacto | upper }}</span></td>
+    <td><span class="badge badge-{{ r.facilidad }}">{{ r.facilidad | upper }}</span></td>
+  </tr>
+  {% endfor %}
+</table>
+
+<!-- ====================================================== -->
+<h2>5. Próximos Pasos</h2>
+<p>{{ next_steps }}</p>
+
+<!-- ====================================================== -->
+<div class="footer">
+  Generado por RGA Copilot · Equipo 5 Tecnológico de Monterrey Campus Guadalajara ·
+  Análisis basado en datos {{ period }}. Las proyecciones son indicativas.
+</div>
+
+</body>
+</html>

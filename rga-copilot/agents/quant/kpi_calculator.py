@@ -56,12 +56,22 @@ class ProductKPI:
 
 
 @dataclass
+class CategoryKPI:
+    categoria: str
+    ingresos: float
+    costo: float
+    margen_bruto: float          # (ingresos - costo) / ingresos
+    pct_total_ingresos: float    # share of period total revenue
+
+
+@dataclass
 class PeriodKPIs:
     period: str
     consolidado: dict
     por_sucursal: list[BranchKPI]
     top_productos: list[ProductKPI]
     pct_mix_categoria: dict[str, float]
+    por_categoria: list[CategoryKPI] = None
 
 
 # ---------------------------------------------------------------------------
@@ -69,7 +79,10 @@ class PeriodKPIs:
 # ---------------------------------------------------------------------------
 
 def _filter_period(df: pd.DataFrame, period: str, mes_col: str = "MES") -> pd.DataFrame:
-    return df[df[mes_col].str.upper() == period.upper()]
+    if df.empty or mes_col not in df.columns:
+        return df
+    col = df[mes_col].astype(str)
+    return df[col.str.upper() == period.upper()]
 
 
 # ---------------------------------------------------------------------------
@@ -196,15 +209,43 @@ def calc_consolidado(branch_kpis: list[BranchKPI]) -> dict:
     }
 
 
+def calc_category_kpis(db: LocalDB, period: str) -> list[CategoryKPI]:
+    """Full category aggregation — all rows, not just top-N products."""
+    bd = _filter_period(db.bd, period)
+    agg = (
+        bd.groupby("SUBCATEGORÍA 1")
+        .agg(
+            ingresos=("SUBTOTAL", "sum"),
+            costo=("COSTO TOTAL SIN IVA", "sum"),
+        )
+        .reset_index()
+    )
+    total = agg["ingresos"].sum()
+    result = []
+    for _, r in agg.iterrows():
+        ing = float(r["ingresos"])
+        costo = float(r["costo"])
+        result.append(CategoryKPI(
+            categoria=str(r["SUBCATEGORÍA 1"]),
+            ingresos=ing,
+            costo=costo,
+            margen_bruto=(ing - costo) / ing if ing else 0.0,
+            pct_total_ingresos=ing / total if total else 0.0,
+        ))
+    return sorted(result, key=lambda x: x.ingresos, reverse=True)
+
+
 def build_period_kpis(db: LocalDB, period: str) -> PeriodKPIs:
     branch_kpis   = calc_branch_kpis(db, period)
     top_productos  = calc_top_products(db, period)
     mix            = calc_category_mix(db, period)
     consolidado    = calc_consolidado(branch_kpis)
+    por_categoria  = calc_category_kpis(db, period)
     return PeriodKPIs(
         period=period,
         consolidado=consolidado,
         por_sucursal=branch_kpis,
         top_productos=top_productos,
         pct_mix_categoria=mix,
+        por_categoria=por_categoria,
     )

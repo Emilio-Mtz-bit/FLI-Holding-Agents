@@ -71,7 +71,7 @@ class PeriodKPIs:
     por_sucursal: list[BranchKPI]
     top_productos: list[ProductKPI]
     pct_mix_categoria: dict[str, float]
-    por_categoria: list[CategoryKPI] = None
+    por_categoria: list[CategoryKPI]
 
 
 # ---------------------------------------------------------------------------

@@ -14,8 +14,8 @@ Scenario 2 — cierre_sucursal:
     Note: if branch EBITDA is negative, closure is positive impact.
 
 Scenario 3 — shift_mix:
-    Shift delta_pct of total revenue from cat_from → cat_to.
-    impact = delta_pct * ingresos_total * (margin_to - margin_from)
+    Shift delta_pct of cat_from revenue → cat_to.
+    impact = (delta_pct * ingresos_cat_from) * (margin_to - margin_from)
 """
 
 from __future__ import annotations
@@ -84,21 +84,22 @@ def build_scenario_shift_mix(
     delta_pct: float = 0.05,
 ) -> Scenario:
     """
-    Shift delta_pct of total revenue from cat_from → cat_to.
-    Revenue is constant; only the margin difference matters for EBITDA.
+    Shift delta_pct of cat_from revenue → cat_to.
+    The 5% applies to cat_from sales only — not total revenue.
+    impact = (delta_pct * ingresos_cat_from) * (margin_to - margin_from)
     """
     kpis = quant.kpis
     base_ebitda = kpis["consolidado"]["ebitda_total"]
-    ingresos_total = kpis["consolidado"]["ingresos_total"]
 
     cat_map = {c["categoria"]: c for c in kpis["por_categoria"]}
     for cat in (cat_from, cat_to):
         if cat not in cat_map:
             raise ValueError(f"Categoría '{cat}' not found. Available: {list(cat_map)}")
 
-    margin_from = cat_map[cat_from]["margen_bruto"]
-    margin_to   = cat_map[cat_to]["margen_bruto"]
-    delta_revenue = ingresos_total * delta_pct
+    margin_from   = cat_map[cat_from]["margen_bruto"]
+    margin_to     = cat_map[cat_to]["margen_bruto"]
+    # Apply delta_pct to the source category's own revenue (not total)
+    delta_revenue = cat_map[cat_from]["ingresos"] * delta_pct
     impact = delta_revenue * (margin_to - margin_from)
 
     return Scenario(

@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grupo NAMA — RGA Intelligence Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0d0d0d;
+    --paper: #f5f0e8;
+    --cream: #ede8dc;
+    --gold: #c9a84c;
+    --gold-light: #e8c96a;
+    --red-alert: #c0392b;
+    --green: #2d6a4f;
+    --slate: #2c3e50;
+    --muted: #7a7060;
+    --border: rgba(13,13,13,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'DM Mono', monospace;
+    font-size: 15px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 48px;
+    background: var(--paper);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(8px);
+  }
+  .nav-brand {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 15px;
+    letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .nav-links {
+    display: flex; gap: 32px; list-style: none;
+  }
+  .nav-links a {
+    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+    text-decoration: none; color: var(--muted);
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--ink); }
+
+  /* ── SLIDES ── */
+  .slide {
+    min-height: 100vh;
+    padding: 100px 80px 60px;
+    position: relative;
+    display: flex; flex-direction: column; justify-content: center;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .slide.visible { opacity: 1; transform: translateY(0); }
+
+  .slide + .slide { border-top: 1px solid var(--border); }
+
+  /* ── SLIDE NUMBERS ── */
+  .slide-num {
+    position: absolute; top: 120px; right: 80px;
+    font-size: 11px; color: var(--muted); letter-spacing: 0.1em;
+  }
+
+  /* ── HERO ── */
+  #slide-hero {
+    background: var(--ink);
+    color: var(--paper);
+    min-height: 100vh;
+    justify-content: flex-end;
+    padding-bottom: 100px;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 70% 40%, rgba(201,168,76,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 80% at 20% 80%, rgba(201,168,76,0.06) 0%, transparent 50%);
+  }
+
+  .hero-label {
+    font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 24px;
+  }
+
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(52px, 8vw, 96px);
+    font-weight: 300;
+    line-height: 1.0;
+    color: var(--paper);
+    margin-bottom: 8px;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .hero-subtitle {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px; font-weight: 400;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: rgba(245,240,232,0.5);
+    margin-bottom: 64px;
+    margin-top: 16px;
+  }
+
+  .hero-meta {
+    display: flex; gap: 64px;
+  }
+  .hero-meta-item { display: flex; flex-direction: column; gap: 4px; }
+  .hero-meta-label { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(245,240,232,0.4); }
+  .hero-meta-value { font-size: 14px; color: var(--paper); }
+
+  /* ── SECTION HEADER ── */
+  .section-eyebrow {
+    font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 300; line-height: 1.1;
+    margin-bottom: 28px;
+  }
+  .section-title em { font-style: italic; color: var(--gold); }
+
+  /* ── OVERVIEW GRID ── */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 48px;
+  }
+  .overview-cell {
+    background: var(--paper);
+    padding: 32px 28px;
+  }
+  .overview-cell-label {
+    font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 8px;
+  }
+  .overview-cell-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px; font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .overview-cell-sub { font-size: 12px; color: var(--muted); }
+
+  /* ── TWO COLUMN LAYOUT ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+
+  /* ── AGENT CARD ── */
+  .agent-card {
+    border: 1px solid var(--border);
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .agent-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  }
+  .agent-card.quant::before { background: var(--gold); }
+  .agent-card.qual::before { background: var(--slate); }
+
+  .agent-badge {
+    display: inline-block;
+    font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+    padding: 4px 10px;
+    margin-bottom: 20px;
+  }
+  .agent-badge.quant { background: rgba(201,168,76,0.15); color: var(--gold); }
+  .agent-badge.qual { background: rgba(44,62,80,0.1); color: var(--slate); }
+
+  .agent-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px; font-weight: 800;
+    margin-bottom: 8px;
+  }
+  .agent-desc { color: var(--muted); margin-bottom: 16px; line-height: 1.6; font-size: 14px; }
+
+  .agent-inputs, .agent-outputs {
+    margin-bottom: 20px;
+  }
+  .agent-section-label {
+    font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 10px;
+  }
+  .tag-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    font-size: 11px; padding: 4px 10px;
+    border: 1px solid var(--border);
+    color: var(--ink);
+  }
+
+  /* ── KPI RESULTS ── */
+  .kpi-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 1px; background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 40px;
+  }
+  .kpi-cell {
+    background: var(--paper);
+    padding: 20px 20px;
+  }
+  .kpi-label {
+    font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 6px;
+  }
+  .kpi-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px; font-weight: 800;
+    margin-bottom: 3px;
+    color: var(--ink);
+  }
+  .kpi-sub { font-size: 12px; color: var(--muted); }
+  .kpi-positive { color: var(--green); }
+  .kpi-neutral { color: var(--ink); }
+
+  /* ── BRANCH TABLE ── */
+  .branch-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 40px;
+  }
+  .branch-table th {
+    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); text-align: left;
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .branch-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(13,13,13,0.06);
+    vertical-align: middle;
+    font-size: 14px;
+  }
+  .branch-table tr:last-child td { border-bottom: none; }
+  .branch-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: 14px;
+  }
+  .margin-bar-wrap { width: 100px; background: var(--cream); height: 6px; position: relative; }
+  .margin-bar { height: 6px; background: var(--gold); }
+  .margin-bar.green { background: var(--green); }
+
+  /* ── TOP PRODUCTS ── */
+  .products-list { display: flex; flex-direction: column; gap: 8px; }
+  .product-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 9px 14px;
+    border: 1px solid var(--border);
+  }
+  .product-rank {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px; color: var(--muted);
+    min-width: 20px;
+  }
+  .product-name { flex: 1; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .product-suc { font-size: 12px; color: var(--muted); min-width: 40px; }
+  .product-cm {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: 13px;
+    min-width: 90px; text-align: right;
+  }
+  .product-bar-wrap { width: 80px; background: var(--cream); height: 4px; }
+  .product-bar { height: 4px; background: var(--gold); }
+
+  /* ── QUAL SIGNALS ── */
+  .signals-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 40px; }
+  .signal-card {
+    border: 1px solid var(--border);
+    padding: 20px;
+  }
+  .signal-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px; font-weight: 700;
+    margin-bottom: 10px;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .signal-item {
+    display: flex; gap: 10px; align-items: flex-start;
+    margin-bottom: 6px;
+    font-size: 13px; line-height: 1.4;
+    color: var(--muted);
+  }
+  .signal-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    flex-shrink: 0; margin-top: 5px;
+  }
+  .dot-green { background: var(--green); }
+  .dot-red { background: var(--red-alert); }
+  .dot-gold { background: var(--gold); }
+
+  /* ── SENTIMENT ── */
+  .sentiment-bar-container {
+    margin-top: 20px;
+  }
+  .sentiment-label {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--muted); margin-bottom: 8px;
+  }
+  .sentiment-track {
+    height: 8px; background: var(--cream); position: relative;
+    border: 1px solid var(--border);
+  }
+  .sentiment-fill {
+    height: 100%; width: 65%;
+    background: linear-gradient(90deg, var(--gold), var(--green));
+  }
+  .sentiment-marker {
+    position: absolute; top: -4px; left: 65%;
+    width: 16px; height: 16px; background: var(--ink);
+    border: 2px solid var(--paper);
+    transform: translateX(-50%);
+    border-radius: 50%;
+  }
+
+  /* ── NARRATIVE QUOTE ── */
+  .narrative-box {
+    border-left: 3px solid var(--gold);
+    padding: 24px 32px;
+    background: rgba(201,168,76,0.06);
+    margin-bottom: 32px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px; font-weight: 300; line-height: 1.8;
+    font-style: italic;
+    color: var(--ink);
+  }
+
+  /* ── SYNTHESIS DIAGRAM ── */
+  .synthesis-diagram {
+    display: flex; align-items: center; justify-content: center;
+    gap: 0;
+    padding: 48px 0;
+    position: relative;
+  }
+
+  .synth-node {
+    border: 1px solid var(--border);
+    padding: 28px 32px;
+    text-align: center;
+    width: 220px;
+    position: relative;
+    background: var(--paper);
+  }
+  .synth-node.quant { border-top: 3px solid var(--gold); }
+  .synth-node.qual { border-top: 3px solid var(--slate); }
+  .synth-node.output {
+    border-top: 3px solid var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+    width: 240px;
+  }
+
+  .synth-node-label {
+    font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .synth-node.quant .synth-node-label { color: var(--gold); }
+  .synth-node.qual .synth-node-label { color: var(--slate); }
+  .synth-node.output .synth-node-label { color: rgba(245,240,232,0.5); }
+
+  .synth-node-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px; font-weight: 800;
+  }
+  .synth-node.output .synth-node-name { color: var(--gold); }
+
+  .synth-node-items {
+    margin-top: 12px;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: left;
+  }
+  .synth-node.output .synth-node-items { color: rgba(245,240,232,0.6); }
+  .synth-node-items li { list-style: none; padding: 2px 0; }
+  .synth-node-items li::before { content: '—  '; color: var(--gold); }
+
+  .synth-arrow {
+    display: flex; align-items: center; padding: 0 20px;
+  }
+  .synth-arrow svg { width: 32px; opacity: 0.3; }
+
+  .synth-connector {
+    width: 60px; height: 1px;
+    background: var(--border);
+    position: relative;
+  }
+  .synth-connector::after {
+    content: '▶';
+    position: absolute; right: -8px; top: -8px;
+    font-size: 8px; color: var(--muted);
+  }
+
+  /* ── ROADMAP ── */
+  .roadmap {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px; background: var(--border);
+    border: 1px solid var(--border);
+  }
+  .roadmap-phase {
+    background: var(--paper);
+    padding: 32px 28px;
+  }
+  .phase-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px; font-weight: 300;
+    color: rgba(13,13,13,0.08);
+    margin-bottom: 8px;
+    line-height: 1;
+  }
+  .phase-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px; font-weight: 700;
+    margin-bottom: 8px;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .phase-tag {
+    display: inline-block;
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 3px 8px; margin-bottom: 16px;
+  }
+  .phase-tag.done { background: rgba(45,106,79,0.1); color: var(--green); }
+  .phase-tag.active { background: rgba(201,168,76,0.15); color: var(--gold); }
+  .phase-tag.next { background: rgba(13,13,13,0.06); color: var(--muted); }
+
+  .phase-items { color: var(--muted); font-size: 13px; }
+  .phase-items li { list-style: none; padding: 3px 0; border-bottom: 1px solid rgba(13,13,13,0.04); }
+  .phase-items li::before { content: '→  '; }
+
+  /* ── CLOSING ── */
+  #slide-close {
+    background: var(--ink); color: var(--paper);
+    justify-content: center; align-items: center; text-align: center;
+  }
+  .close-eyebrow { font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); margin-bottom: 24px; }
+  .close-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(48px, 6vw, 80px); font-weight: 300;
+    line-height: 1.0; margin-bottom: 16px;
+  }
+  .close-sub { color: rgba(245,240,232,0.4); letter-spacing: 0.12em; text-transform: uppercase; font-size: 11px; }
+
+  /* ── DIVIDER ── */
+  .divider { width: 48px; height: 1px; background: var(--gold); margin: 0 0 40px; }
+
+  /* ── ALERTS NONE ── */
+  .no-alerts {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 20px;
+    background: rgba(45,106,79,0.08);
+    border: 1px solid rgba(45,106,79,0.2);
+    color: var(--green);
+    font-size: 12px;
+    margin-top: 16px;
+  }
+  .no-alerts-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+
+  /* ── SCROLL PROGRESS ── */
+  .scroll-progress {
+    position: fixed; top: 0; left: 0; height: 2px; background: var(--gold);
+    z-index: 200; transition: width 0.1s;
+    width: 0%;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .stagger > * {
+    opacity: 0;
+    animation: fadeSlide 0.6s ease forwards;
+  }
+  .stagger > *:nth-child(1) { animation-delay: 0.1s; }
+  .stagger > *:nth-child(2) { animation-delay: 0.2s; }
+  .stagger > *:nth-child(3) { animation-delay: 0.3s; }
+  .stagger > *:nth-child(4) { animation-delay: 0.4s; }
+  .stagger > *:nth-child(5) { animation-delay: 0.5s; }
+
+  /* ── UTILITY ── */
+  .mt-8 { margin-top: 8px; }
+  .mt-16 { margin-top: 16px; }
+  .mt-24 { margin-top: 24px; }
+  .mb-0 { margin-bottom: 0; }
+
+  .text-muted { color: var(--muted); }
+  .text-gold { color: var(--gold); }
+
+  p.body-text {
+    font-size: 14px; color: var(--muted);
+    max-width: 640px; line-height: 1.7;
+    margin-bottom: 20px;
+  }
+
+  .inline-tag {
+    display: inline-block; font-size: 10px;
+    padding: 2px 8px; letter-spacing: 0.1em; text-transform: uppercase;
+    background: rgba(201,168,76,0.12); color: var(--gold);
+    margin-left: 8px; vertical-align: middle;
+  }
+
+  /* ── SYNTH AGENT CARD ── */
+  .agent-card.synth::before { background: var(--ink); }
+  .agent-badge.synth { background: rgba(13,13,13,0.08); color: var(--ink); }
+
+  /* ── SIGNAL RESULT CARDS ── */
+  .signal-result-card {
+    border: 1px solid var(--border);
+    padding: 20px 24px;
+    position: relative;
+    border-left: 3px solid var(--gold);
+  }
+  .signal-result-rank {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px; font-weight: 300; color: rgba(13,13,13,0.1);
+    position: absolute; top: 12px; right: 18px; line-height: 1;
+  }
+  .signal-result-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    margin-bottom: 10px; max-width: 85%;
+  }
+  .signal-badges { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+  .badge {
+    font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 3px 8px;
+  }
+  .badge-alto { background: rgba(192,57,43,0.1); color: var(--red-alert); }
+  .badge-medio { background: rgba(201,168,76,0.12); color: var(--gold); }
+  .badge-alta-ease { background: rgba(45,106,79,0.1); color: var(--green); }
+  .badge-media-ease { background: rgba(201,168,76,0.12); color: var(--gold); }
+  .signal-evidence {
+    font-size: 12px; color: var(--muted); line-height: 1.6;
+    border-left: 2px solid var(--cream); padding-left: 12px;
+    margin-bottom: 8px;
+  }
+  .signal-rec {
+    font-size: 12px; line-height: 1.5;
+    padding: 8px 12px; background: rgba(13,13,13,0.03);
+    border: 1px solid var(--border);
+  }
+
+  /* ── SCENARIO TABLE ── */
+  .scenario-table {
+    width: 100%; border-collapse: collapse;
+    margin-bottom: 24px;
+  }
+  .scenario-table th {
+    font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--muted); text-align: left;
+    padding: 8px 14px; border-bottom: 1px solid var(--border);
+  }
+  .scenario-table td {
+    padding: 11px 14px;
+    border-bottom: 1px solid rgba(13,13,13,0.05);
+    font-size: 13px; vertical-align: middle;
+  }
+  .scenario-table tr:last-child td { border-bottom: none; }
+  .impact-neg { color: var(--red-alert); font-family: 'Syne', sans-serif; font-weight: 700; }
+  .impact-pos { color: var(--green); font-family: 'Syne', sans-serif; font-weight: 700; }
+
+  /* ── PDF BADGE ── */
+  .pdf-badge {
+    display: inline-flex; align-items: center; gap: 10px;
+    border: 1px solid rgba(45,106,79,0.3);
+    background: rgba(45,106,79,0.06);
+    padding: 10px 18px;
+    font-size: 12px; color: var(--green);
+  }
+  .pdf-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<nav>
+  <ul class="nav-links">
+    <li><a href="#slide-overview">Overview</a></li>
+    <li><a href="#slide-quant">Quant Agent</a></li>
+    <li><a href="#slide-qual">Qual Agent</a></li>
+    <li><a href="#slide-synthesis">Síntesis</a></li>
+    <li><a href="#slide-roadmap">Roadmap</a></li>
+  </ul>
+</nav>
+
+<!-- ══ 01 · HERO ══ -->
+<section class="slide" id="slide-hero" style="opacity:1; transform:none;">
+  <div class="hero-bg"></div>
+  <div class="hero-label">Reporte de Gestión Aplicada — Tec de Monterrey</div>
+  <h1 class="hero-title">Grupo<br><em>NAMA</em></h1>
+  <div class="hero-subtitle">Intelligence Platform — Project Update</div>
+  <div style="border-top: 1px solid rgba(245,240,232,0.1); padding-top: 28px; margin-top: 40px;">
+    <span style="font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,240,232,0.35); display: block; margin-bottom: 12px;">Equipo</span>
+    <div style="display: flex; gap: 40px; flex-wrap: wrap;">
+      <span style="font-size: 12px; color: rgba(245,240,232,0.7);">Josue Tapia Hernández</span>
+      <span style="font-size: 12px; color: rgba(245,240,232,0.7);">Jose Emilio Martínez Hernández</span>
+      <span style="font-size: 12px; color: rgba(245,240,232,0.7);">Diego Aréchiga Bonilla</span>
+      <span style="font-size: 12px; color: rgba(245,240,232,0.7);">Andrés Martínez Almazán</span>
+    </div>
+  </div>
+  <div class="slide-num" style="color: rgba(245,240,232,0.3);">01 / 06</div>
+</section>
+
+<!-- ══ 02 · OVERVIEW ══ -->
+<section class="slide" id="slide-overview">
+  <div class="slide-num">02 / 06</div>
+  <div class="section-eyebrow">Plataforma de Análisis</div>
+  <h2 class="section-title">Arquitectura del<br><em>Sistema</em></h2>
+
+  <p class="body-text">
+    Tres agentes de IA coordinados por un Orquestador analizan a Grupo NAMA desde dimensiones complementarias y sintetizan el diagnóstico en un reporte ejecutivo unificado.
+  </p>
+
+  <div class="three-col" style="margin-bottom: 24px;">
+    <div class="agent-card quant">
+      <div class="agent-badge quant">Agente 01</div>
+      <div class="agent-name">QuantAgent</div>
+      <p class="agent-desc">KPIs financieros y operativos a partir de datos transaccionales, gastos y nómina.</p>
+      <div class="agent-inputs">
+        <div class="agent-section-label">Inputs</div>
+        <div class="tag-list">
+          <span class="tag">BD Ventas (CSV)</span>
+          <span class="tag">Gastos 2026</span>
+          <span class="tag">Nómina 2026</span>
+        </div>
+      </div>
+      <div class="agent-outputs">
+        <div class="agent-section-label">Outputs</div>
+        <div class="tag-list">
+          <span class="tag">KPIs por sucursal</span>
+          <span class="tag">Alertas financieras</span>
+          <span class="tag">Top productos</span>
+          <span class="tag">Narrativa ejecutiva</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="agent-card qual">
+      <div class="agent-badge qual">Agente 02</div>
+      <div class="agent-name">QualAgent</div>
+      <p class="agent-desc">Señales estratégicas desde documentos internos, contexto de marca y factores del entorno.</p>
+      <div class="agent-inputs">
+        <div class="agent-section-label">Inputs</div>
+        <div class="tag-list">
+          <span class="tag">Documentos PDF</span>
+          <span class="tag">Archivos Texto</span>
+          <span class="tag">Imágenes (OCR)</span>
+        </div>
+      </div>
+      <div class="agent-outputs">
+        <div class="agent-section-label">Outputs</div>
+        <div class="tag-list">
+          <span class="tag">Señales estratégicas</span>
+          <span class="tag">Sentiment score</span>
+          <span class="tag">Riesgos y fortalezas</span>
+          <span class="tag">Resumen ejecutivo</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="agent-card synth">
+      <div class="agent-badge synth">Agente 03</div>
+      <div class="agent-name">SynthAgent</div>
+      <p class="agent-desc">Cruza evidencia cuantitativa y cualitativa para producir señales prioritarias, escenarios what-if y memo ejecutivo PDF.</p>
+      <div class="agent-inputs">
+        <div class="agent-section-label">Inputs</div>
+        <div class="tag-list">
+          <span class="tag">QuantOutput</span>
+          <span class="tag">QualOutput</span>
+        </div>
+      </div>
+      <div class="agent-outputs">
+        <div class="agent-section-label">Outputs</div>
+        <div class="tag-list">
+          <span class="tag">Top 3 señales</span>
+          <span class="tag">Escenarios what-if</span>
+          <span class="tag">Recomendaciones</span>
+          <span class="tag">Memo PDF</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 03 · QUANT RESULTS ══ -->
+<section class="slide" id="slide-quant">
+  <div class="slide-num">03 / 06</div>
+  <div class="section-eyebrow">QuantAgent — Enero 2026</div>
+  <h2 class="section-title">Resultados<br><em>Financieros</em></h2>
+
+  <!-- KPI Summary -->
+  <div class="kpi-grid">
+    <div class="kpi-cell">
+      <div class="kpi-label">Ingresos Totales</div>
+      <div class="kpi-value">$8.99M</div>
+      <div class="kpi-sub">MXN · 5 sucursales</div>
+    </div>
+    <div class="kpi-cell">
+      <div class="kpi-label">Margen Bruto Global</div>
+      <div class="kpi-value kpi-positive">69.7%</div>
+      <div class="kpi-sub">Estructura de costos sólida</div>
+    </div>
+    <div class="kpi-cell">
+      <div class="kpi-label">EBITDA</div>
+      <div class="kpi-value">$2.24M</div>
+      <div class="kpi-sub">Margen EBITDA: 24.9%</div>
+    </div>
+    <div class="kpi-cell">
+      <div class="kpi-label">Alertas Activas</div>
+      <div class="kpi-value kpi-positive">0</div>
+      <div class="kpi-sub">Todos los indicadores en rango</div>
+    </div>
+  </div>
+
+  <!-- Branch performance -->
+  <div class="two-col">
+    <div>
+      <div class="section-eyebrow" style="margin-bottom: 10px;">Desempeño por Sucursal</div>
+      <table class="branch-table">
+        <thead>
+          <tr>
+            <th>Sucursal</th>
+            <th>Ingresos</th>
+            <th>M. Bruto</th>
+            <th>EBITDA</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="branch-name">ANT</span></td>
+            <td>$3.16M</td>
+            <td>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span>69.4%</span>
+                <div class="margin-bar-wrap"><div class="margin-bar" style="width:69%"></div></div>
+              </div>
+            </td>
+            <td style="color: var(--green);">$1,094K</td>
+          </tr>
+          <tr>
+            <td><span class="branch-name">SOK</span></td>
+            <td>$2.39M</td>
+            <td>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span>68.2%</span>
+                <div class="margin-bar-wrap"><div class="margin-bar" style="width:68%"></div></div>
+              </div>
+            </td>
+            <td style="color: var(--gold);">$428K</td>
+          </tr>
+          <tr>
+            <td><span class="branch-name">CAM</span></td>
+            <td>$1.82M</td>
+            <td>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span>69.8%</span>
+                <div class="margin-bar-wrap"><div class="margin-bar green" style="width:70%"></div></div>
+              </div>
+            </td>
+            <td style="color: var(--green);">$618K</td>
+          </tr>
+          <tr>
+            <td><span class="branch-name">JUR</span></td>
+            <td>$1.14M</td>
+            <td>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span>72.8%</span>
+                <div class="margin-bar-wrap"><div class="margin-bar green" style="width:73%"></div></div>
+              </div>
+            </td>
+            <td style="color: var(--green);">$310K</td>
+          </tr>
+          <tr>
+            <td><span class="branch-name">MOR</span></td>
+            <td>$471K</td>
+            <td>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span>72.1%</span>
+                <div class="margin-bar-wrap"><div class="margin-bar green" style="width:72%"></div></div>
+              </div>
+            </td>
+            <td style="color: var(--gold);">$97K</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="no-alerts">
+        <div class="no-alerts-dot"></div>
+        Sin alertas activas — todos los indicadores dentro de rango operativo
+      </div>
+    </div>
+
+    <div>
+      <div class="section-eyebrow" style="margin-bottom: 10px;">Top 5 Productos por Contribución Marginal</div>
+      <div class="products-list">
+        <div class="product-row">
+          <span class="product-rank">1</span>
+          <span class="product-name">Yakimeshi Mixto</span>
+          <span class="product-suc">ANT</span>
+          <span class="product-cm" style="color: var(--gold);">$115,352</span>
+          <div class="product-bar-wrap"><div class="product-bar" style="width:100%"></div></div>
+        </div>
+        <div class="product-row">
+          <span class="product-rank">2</span>
+          <span class="product-name">Yakimeshi Mixto</span>
+          <span class="product-suc">CAM</span>
+          <span class="product-cm">$91,812</span>
+          <div class="product-bar-wrap"><div class="product-bar" style="width:79%"></div></div>
+        </div>
+        <div class="product-row">
+          <span class="product-rank">3</span>
+          <span class="product-name">Ronqueo Soko</span>
+          <span class="product-suc">SOK</span>
+          <span class="product-cm">$85,602</span>
+          <div class="product-bar-wrap"><div class="product-bar" style="width:74%"></div></div>
+        </div>
+        <div class="product-row">
+          <span class="product-rank">4</span>
+          <span class="product-name">Crispy Tuna</span>
+          <span class="product-suc">ANT</span>
+          <span class="product-cm">$66,576</span>
+          <div class="product-bar-wrap"><div class="product-bar" style="width:57%"></div></div>
+        </div>
+        <div class="product-row">
+          <span class="product-rank">5</span>
+          <span class="product-name">Camarones Roca</span>
+          <span class="product-suc">ANT</span>
+          <span class="product-cm">$65,945</span>
+          <div class="product-bar-wrap"><div class="product-bar" style="width:57%"></div></div>
+        </div>
+      </div>
+
+      <div class="mt-24">
+        <div class="section-eyebrow" style="margin-bottom: 12px;">Mix de Categorías (Ingresos)</div>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="font-size:11px; min-width:80px;">Alimentos</span>
+            <div style="flex:1; background:var(--cream); height:8px;"><div style="height:8px; background:var(--gold); width:77.31%"></div></div>
+            <span style="font-size:11px; min-width:36px; text-align:right;">77.3%</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="font-size:11px; min-width:80px;">Bebidas</span>
+            <div style="flex:1; background:var(--cream); height:8px;"><div style="height:8px; background:var(--slate); width:11.24%"></div></div>
+            <span style="font-size:11px; min-width:36px; text-align:right;">11.2%</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="font-size:11px; min-width:80px;">Destilados</span>
+            <div style="flex:1; background:var(--cream); height:8px;"><div style="height:8px; background:var(--muted); width:8.39%"></div></div>
+            <span style="font-size:11px; min-width:36px; text-align:right;">8.4%</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="font-size:11px; min-width:80px;">Vinos</span>
+            <div style="flex:1; background:var(--cream); height:8px;"><div style="height:8px; background:var(--muted); width:2.25%; opacity:0.5"></div></div>
+            <span style="font-size:11px; min-width:36px; text-align:right;">2.3%</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="font-size:11px; min-width:80px;">Café Inf.</span>
+            <div style="flex:1; background:var(--cream); height:8px;"><div style="height:8px; background:var(--muted); width:0.82%; opacity:0.3"></div></div>
+            <span style="font-size:11px; min-width:36px; text-align:right;">0.8%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Narrative -->
+  <div style="margin-top: 24px;">
+    <div class="section-eyebrow" style="margin-bottom: 10px;">Narrativa Ejecutiva · Generada por IA</div>
+    <div class="narrative-box">
+      En enero 2026, Grupo Nama registró ingresos por $8.99M MXN con utilidad bruta de $6.27M — margen bruto global de 69.7%. El EBITDA alcanzó $2.24M (24.9%), tras absorber nómina de $2.30M (25.6% de ingresos) y gastos operativos de $1.73M. Gastos financieros ($691K) se reportan por debajo de la línea EBITDA. Sin alertas activas: todos los indicadores dentro de rangos establecidos.
+    </div>
+  </div>
+</section>
+
+<!-- ══ 04 · QUAL RESULTS ══ -->
+<section class="slide" id="slide-qual">
+  <div class="slide-num">04 / 06</div>
+  <div class="section-eyebrow">QualAgent — Mayo 2026</div>
+  <h2 class="section-title">Señales<br><em>Estratégicas</em></h2>
+
+  <div class="two-col" style="margin-bottom: 24px;">
+    <!-- Sentiment -->
+    <div>
+      <div class="section-eyebrow" style="margin-bottom: 10px;">Sentiment Score</div>
+      <div style="border: 1px solid var(--border); padding: 24px;">
+        <div style="font-family: 'Cormorant Garamond', serif; font-size: 56px; font-weight: 300; line-height:1; margin-bottom: 6px;">0.65</div>
+        <div style="font-size: 13px; color: var(--muted); margin-bottom: 16px;">Perspectiva Favorable — Escala 0–1</div>
+        <div class="sentiment-track">
+          <div class="sentiment-fill"></div>
+          <div class="sentiment-marker"></div>
+        </div>
+        <div class="sentiment-label mt-8">
+          <span>Negativo</span>
+          <span>Neutro</span>
+          <span>Positivo</span>
+        </div>
+        <p style="font-size: 13px; color: var(--muted); margin-top: 12px; line-height: 1.6;">
+          Crecimiento acelerado y cultura ágil compensan riesgos de estandarización e insumos importados.
+        </p>
+      </div>
+    </div>
+
+    <!-- Posicionamiento + Tipo -->
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="border: 1px solid var(--border); padding: 18px; border-top: 3px solid var(--slate);">
+        <div class="agent-section-label">Tipo de Empresa</div>
+        <div style="font-size: 14px; line-height: 1.6; margin-top: 6px;">
+          Grupo restaurantero mexicano — cocina japonesa y asiática, casual fine dining, Querétaro y Morelia.
+        </div>
+      </div>
+      <div style="border: 1px solid var(--border); padding: 18px; border-top: 3px solid var(--gold);">
+        <div class="agent-section-label">Posicionamiento</div>
+        <div style="font-size: 14px; line-height: 1.6; margin-top: 6px;">
+          Gama media-alta en el Bajío. Diferenciado por calidad del producto del mar, innovación gastronómica y servicio cercano al fine dining.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Signals grid -->
+  <div class="signals-grid">
+    <div class="signal-card">
+      <div class="signal-title" style="color: var(--green);">Fortalezas Identificadas</div>
+      <div class="signal-item"><div class="signal-dot dot-green"></div>Crecimiento acelerado: 5 sucursales en 4 años de operación</div>
+      <div class="signal-item"><div class="signal-dot dot-green"></div>Diversificación con NAMA Sushi y el nuevo concepto Soko Teppan</div>
+      <div class="signal-item"><div class="signal-dot dot-green"></div>Ubicaciones estratégicas en plazas premium con público AB+</div>
+      <div class="signal-item"><div class="signal-dot dot-green"></div>Calidad rigurosa en selección de pescados y técnicas japonesas</div>
+      <div class="signal-item"><div class="signal-dot dot-green"></div>Cultura organizacional ágil con toma de decisiones rápida</div>
+      <div class="signal-item"><div class="signal-dot dot-green"></div>Identidad de marca coherente y presencia digital activa</div>
+    </div>
+
+    <div class="signal-card">
+      <div class="signal-title" style="color: var(--red-alert);">Riesgos Identificados</div>
+      <div class="signal-item"><div class="signal-dot dot-red"></div>Estandarización en producto y servicio conforme crece el número de sucursales</div>
+      <div class="signal-item"><div class="signal-dot dot-red"></div>Alta rotación de personal característica del sector restaurantero</div>
+      <div class="signal-item"><div class="signal-dot dot-red"></div>Necesidad de profesionalizar procesos y construir mandos medios</div>
+      <div class="signal-item"><div class="signal-dot dot-red"></div>Exposición a fluctuación de precios en insumos importados</div>
+      <div class="signal-item"><div class="signal-dot dot-red"></div>Riesgo de canibalización entre las marcas NAMA y Soko Teppan</div>
+      <div class="signal-item"><div class="signal-dot dot-red"></div>Variaciones cambiarias y dependencia de abastecimiento exterior</div>
+    </div>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <div class="section-eyebrow" style="margin-bottom: 12px;">Factores de Crecimiento</div>
+    <div class="three-col">
+      <div style="border: 1px solid var(--border); padding: 16px;">
+        <div class="signal-dot dot-gold" style="margin-bottom: 8px;"></div>
+        <div style="font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em;">Expansión Geográfica</div>
+        <div style="font-size: 13px; color: var(--muted); line-height: 1.5;">Morelia valida el modelo para nuevas plazas.</div>
+      </div>
+      <div style="border: 1px solid var(--border); padding: 16px;">
+        <div class="signal-dot dot-gold" style="margin-bottom: 8px;"></div>
+        <div style="font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em;">Nuevo Concepto</div>
+        <div style="font-size: 13px; color: var(--muted); line-height: 1.5;">Soko Teppan: menor competencia directa en teppanyaki.</div>
+      </div>
+      <div style="border: 1px solid var(--border); padding: 16px;">
+        <div class="signal-dot dot-gold" style="margin-bottom: 8px;"></div>
+        <div style="font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em;">Capacitación Interna</div>
+        <div style="font-size: 13px; color: var(--muted); line-height: 1.5;">Esquemas que replican estándares NAMA en aperturas.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 05 · SYNTHESIS ══ -->
+<section class="slide" id="slide-synthesis">
+  <div class="slide-num">05 / 06</div>
+  <div class="section-eyebrow">SynthAgent — Enero 2026</div>
+  <h2 class="section-title">Señales &amp;<br><em>Escenarios</em></h2>
+
+  <!-- Top 3 signals -->
+  <div class="section-eyebrow" style="margin-bottom: 12px;">Top 3 Señales Prioritarias</div>
+  <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 36px;">
+
+    <div class="signal-result-card">
+      <div class="signal-result-rank">1</div>
+      <div class="signal-result-title">Nómina crítica en SOK y MOR comprime EBITDA</div>
+      <div class="signal-badges">
+        <span class="badge badge-alto">Impacto: Alto</span>
+        <span class="badge badge-media-ease">Facilidad: Media</span>
+      </div>
+      <div class="signal-evidence">
+        <strong>Quant:</strong> SOK EBITDA $428K (17.9% margen) y MOR EBITDA $97K (20.6% margen) — vs ANT $1,094K (34.6%). SOK nómina $727K representa 30.4% de sus ingresos; MOR nómina $157K = 33.4%. Nómina total grupo: $2.30M (25.6% de ingresos).
+        <br><strong>Qual:</strong> Alta rotación de personal y necesidad de profesionalizar mandos medios documentadas como riesgo estructural.
+      </div>
+      <div class="signal-rec">→ Revisar estructura salarial en SOK y MOR; implementar esquemas de bonos por desempeño vinculados a EBITDA.</div>
+    </div>
+
+    <div class="signal-result-card" style="border-left-color: var(--red-alert);">
+      <div class="signal-result-rank">2</div>
+      <div class="signal-result-title">MOR: sucursal de menor escala con EBITDA en riesgo</div>
+      <div class="signal-badges">
+        <span class="badge badge-alto">Impacto: Alto</span>
+        <span class="badge badge-media-ease">Facilidad: Media</span>
+      </div>
+      <div class="signal-evidence">
+        <strong>Quant:</strong> MOR genera $470,759 ingresos (5.2% del grupo), 173 transacciones, ticket promedio $2,721 (el más bajo). EBITDA $96,851 = 20.6% margen; 4.3% del EBITDA consolidado $2.24M. Nómina/ingresos = 33.4% — el porcentaje más alto del grupo.
+        <br><strong>Qual:</strong> Morelia valida el modelo de expansión geográfica, pero requiere volumen crítico para absorber estructura de costos fijos proporcionalmente alta.
+      </div>
+      <div class="signal-rec">→ Plan de escalamiento MOR: objetivo +30% en transacciones o restructuración de costos fijos (nómina, renta).</div>
+    </div>
+
+    <div class="signal-result-card" style="border-left-color: var(--slate);">
+      <div class="signal-result-rank">3</div>
+      <div class="signal-result-title">Vinos con margen inferior compromete mix de rentabilidad</div>
+      <div class="signal-badges">
+        <span class="badge badge-medio">Impacto: Medio</span>
+        <span class="badge badge-alta-ease">Facilidad: Alta</span>
+      </div>
+      <div class="signal-evidence">
+        <strong>Quant:</strong> Vinos = 2.3% del ingreso con margen bruto inferior al de Alimentos (77.3% del mix). Costo insumo Vinos sensible a variaciones cambiarias.
+        <br><strong>Qual:</strong> Diferenciación por calidad del producto del mar e innovación gastronómica — oportunidad de rebalancear mix hacia categorías de mayor margen.
+      </div>
+      <div class="signal-rec">→ Optimizar carta de vinos reduciendo referencias de bajo margen; fortalecer categorías Alimentos y Destilados de alto margen.</div>
+    </div>
+  </div>
+
+  <!-- Scenarios table -->
+  <div class="two-col">
+    <div>
+      <div class="section-eyebrow" style="margin-bottom: 12px;">Escenarios What-If (Impacto EBITDA)</div>
+      <table class="scenario-table">
+        <thead>
+          <tr>
+            <th>Escenario</th>
+            <th>Supuesto</th>
+            <th>Δ EBITDA</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div style="font-family:'Syne',sans-serif; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em;">Costo insumo<br>Alimentos +15%</div>
+            </td>
+            <td style="color:var(--muted); font-size:12px;">COGS Alimentos sube 15% — categoría dominante (77.3% mix)</td>
+            <td class="impact-neg">−$308,532</td>
+          </tr>
+          <tr>
+            <td>
+              <div style="font-family:'Syne',sans-serif; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em;">Cierre<br>sucursal MOR</div>
+            </td>
+            <td style="color:var(--muted); font-size:12px;">Pérdida de contribución EBITDA de MOR al consolidado</td>
+            <td class="impact-neg">−$96,851</td>
+          </tr>
+          <tr>
+            <td>
+              <div style="font-family:'Syne',sans-serif; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em;">Mix shift 5%<br>Vinos → Alimentos</div>
+            </td>
+            <td style="color:var(--muted); font-size:12px;">5% de ventas Vinos ($10,117) reasignado a Alimentos — mayor margen</td>
+            <td class="impact-pos">+$1,359</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      <div class="section-eyebrow" style="margin-bottom: 12px;">Próximos Pasos (IA)</div>
+      <div style="border: 1px solid var(--border); padding: 20px; border-left: 3px solid var(--gold); margin-bottom: 16px;">
+        <div style="font-size: 13px; color: var(--muted); line-height: 1.7;">
+          Implementar métricas de productividad por empleado en SOK y MOR (nómina/ingresos &gt; 30%). Establecer umbrales de alerta temprana para margen EBITDA &lt; 20% por sucursal. Priorizar crecimiento de volumen en MOR — su estructura de costos fijos es proporcionalmente alta vs grupo.
+        </div>
+      </div>
+
+      <div class="section-eyebrow" style="margin-bottom: 10px;">Reporte Generado</div>
+      <div class="pdf-badge">
+        <div class="pdf-dot"></div>
+        <div>
+          <div style="font-family:'Syne',sans-serif; font-weight:700; font-size:13px;">memo_ENERO_2026.pdf</div>
+          <div style="font-size:11px; color:var(--muted); margin-top:2px;">Generado por SynthAgent · Jinja2 + WeasyPrint</div>
+        </div>
+      </div>
+
+      <div style="margin-top: 16px; border: 1px solid var(--border); padding: 16px; background: rgba(13,13,13,0.02);">
+        <div class="agent-section-label" style="margin-bottom: 8px;">Pipeline Orquestado</div>
+        <div style="display: flex; align-items: center; gap: 0; font-size: 11px; flex-wrap: wrap; gap: 4px;">
+          <span style="padding: 4px 10px; background: rgba(201,168,76,0.12); color: var(--gold);">QuantAgent</span>
+          <span style="color: var(--muted); padding: 0 6px;">→</span>
+          <span style="padding: 4px 10px; background: rgba(44,62,80,0.08); color: var(--slate);">QualAgent</span>
+          <span style="color: var(--muted); padding: 0 6px;">→</span>
+          <span style="padding: 4px 10px; background: rgba(13,13,13,0.08); color: var(--ink);">SynthAgent</span>
+          <span style="color: var(--muted); padding: 0 6px;">→</span>
+          <span style="padding: 4px 10px; background: rgba(45,106,79,0.1); color: var(--green);">PDF ✓</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 06 · ROADMAP ══ -->
+<section class="slide" id="slide-roadmap">
+  <div class="slide-num">06 / 06</div>
+  <div class="section-eyebrow">Estado del Proyecto</div>
+  <h2 class="section-title">Roadmap &<br><em>Próximos Pasos</em></h2>
+
+  <div class="roadmap" style="margin-bottom: 28px; grid-template-columns: repeat(4, 1fr);">
+    <div class="roadmap-phase">
+      <div class="phase-num">01</div>
+      <div class="phase-title">Pipeline de Datos</div>
+      <span class="phase-tag done">Completado</span>
+      <ul class="phase-items">
+        <li>Ingesta CSV + XLSX</li>
+        <li>Limpieza y normalización</li>
+        <li>LocalDB en memoria</li>
+        <li>Mapeo de sucursales</li>
+      </ul>
+    </div>
+    <div class="roadmap-phase">
+      <div class="phase-num">02</div>
+      <div class="phase-title">Agentes Independientes</div>
+      <span class="phase-tag done">Completado</span>
+      <ul class="phase-items">
+        <li>QuantAgent operacional</li>
+        <li>QualAgent operacional</li>
+        <li>Detección de alertas</li>
+        <li>Outputs JSON validados</li>
+      </ul>
+    </div>
+    <div class="roadmap-phase">
+      <div class="phase-num">03</div>
+      <div class="phase-title">SynthAgent + Orquestador</div>
+      <span class="phase-tag done">Completado</span>
+      <ul class="phase-items">
+        <li>SynthAgent operacional</li>
+        <li>Escenarios what-if</li>
+        <li>Memo PDF generado</li>
+        <li>Orquestador end-to-end</li>
+      </ul>
+    </div>
+    <div class="roadmap-phase" style="background: rgba(201,168,76,0.03);">
+      <div class="phase-num">04</div>
+      <div class="phase-title">API + Dashboard</div>
+      <span class="phase-tag next">Siguiente</span>
+      <ul class="phase-items">
+        <li>REST API FastAPI</li>
+        <li>Dashboard interactivo</li>
+        <li>Multi-período comparativo</li>
+        <li>Deploy en nube</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <div class="section-eyebrow" style="margin-bottom: 16px;">Períodos a Analizar</div>
+      <div style="display: flex; flex-direction: column; gap: 2px;">
+        <div style="display:flex; justify-content:space-between; padding: 10px 14px; background: rgba(45,106,79,0.08); border: 1px solid rgba(45,106,79,0.2);">
+          <span>Enero 2026</span>
+          <span style="color: var(--green); font-size: 12px; letter-spacing: 0.1em;">ANALIZADO ✓</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding: 10px 14px; border: 1px solid var(--border);">
+          <span>Febrero 2026</span>
+          <span style="color: var(--gold); font-size: 12px; letter-spacing: 0.1em;">PENDIENTE</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding: 10px 14px; border: 1px solid var(--border);">
+          <span>Marzo 2026</span>
+          <span style="color: var(--gold); font-size: 12px; letter-spacing: 0.1em;">PENDIENTE</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding: 10px 14px; border: 1px solid var(--border);">
+          <span>Abril 2026</span>
+          <span style="color: var(--gold); font-size: 12px; letter-spacing: 0.1em;">PENDIENTE</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-eyebrow" style="margin-bottom: 16px;">Métricas del Sistema</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: var(--border); border: 1px solid var(--border);">
+        <div style="background: var(--paper); padding: 20px 16px;">
+          <div class="kpi-label">Transacciones BD</div>
+          <div style="font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800;">1,482</div>
+          <div class="kpi-sub">5 sucursales</div>
+        </div>
+        <div style="background: var(--paper); padding: 20px 16px;">
+          <div class="kpi-label">KPIs calculados</div>
+          <div style="font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800;">11+</div>
+          <div class="kpi-sub">por sucursal + categoría</div>
+        </div>
+        <div style="background: var(--paper); padding: 20px 16px;">
+          <div class="kpi-label">Señales sintetizadas</div>
+          <div style="font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800;">3</div>
+          <div class="kpi-sub">top señales priorizadas</div>
+        </div>
+        <div style="background: var(--paper); padding: 20px 16px;">
+          <div class="kpi-label">Escenarios what-if</div>
+          <div style="font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800;">3</div>
+          <div class="kpi-sub">impacto EBITDA cuantificado</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Scroll progress bar
+  window.addEventListener('scroll', () => {
+    const total = document.body.scrollHeight - window.innerHeight;
+    const pct = (window.scrollY / total) * 100;
+    document.getElementById('scrollProgress').style.width = pct + '%';
+  });
+
+  // Intersection observer for slide reveal
+  const slides = document.querySelectorAll('.slide:not(#slide-hero)');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  slides.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

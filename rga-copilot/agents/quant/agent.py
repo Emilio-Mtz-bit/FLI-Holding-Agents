@@ -119,4 +119,5 @@ def _serialize_kpis(kpis: PeriodKPIs) -> dict:
         "consolidado": kpis.consolidado,
         "por_sucursal": [vars(b) for b in kpis.por_sucursal],
         "pct_mix_categoria": kpis.pct_mix_categoria,
+        "por_categoria": [vars(c) for c in kpis.por_categoria],
     }

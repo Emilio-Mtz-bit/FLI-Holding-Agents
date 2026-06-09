@@ -56,12 +56,22 @@ class ProductKPI:
 
 
 @dataclass
+class CategoryKPI:
+    categoria: str
+    ingresos: float
+    costo: float
+    margen_bruto: float          # (ingresos - costo) / ingresos
+    pct_total_ingresos: float    # share of period total revenue
+
+
+@dataclass
 class PeriodKPIs:
     period: str
     consolidado: dict
     por_sucursal: list[BranchKPI]
     top_productos: list[ProductKPI]
     pct_mix_categoria: dict[str, float]
+    por_categoria: list[CategoryKPI]
 
 
 # ---------------------------------------------------------------------------
@@ -69,7 +79,10 @@ class PeriodKPIs:
 # ---------------------------------------------------------------------------
 
 def _filter_period(df: pd.DataFrame, period: str, mes_col: str = "MES") -> pd.DataFrame:
-    return df[df[mes_col].str.upper() == period.upper()]
+    if df.empty or mes_col not in df.columns:
+        return df
+    col = df[mes_col].astype(str)
+    return df[col.str.upper() == period.upper()]
 
 
 # ---------------------------------------------------------------------------
@@ -93,6 +106,9 @@ def calc_branch_kpis(db: LocalDB, period: str) -> list[BranchKPI]:
     # Gastos — periodo puede estar en FECHA GASTO o MES GASTO depending on sheet
     mes_col_gastos = "MES GASTO" if "MES GASTO" in db.gastos.columns else "MES"
     gastos_p = _filter_period(db.gastos, period, mes_col=mes_col_gastos)
+    # Gastos Financieros va debajo de la línea EBITDA en el ER — no deducir aquí
+    if "CATEGORÍA GASTO" in gastos_p.columns:
+        gastos_p = gastos_p[gastos_p["CATEGORÍA GASTO"] != "Gastos Financieros"]
     gastos_p = gastos_p[~gastos_p["SUCURSAL"].isin(["Corporativo"])]
     agg_gastos = (
         gastos_p.groupby("SUCURSAL")["SUBTOTAL"]
@@ -178,12 +194,34 @@ def calc_category_mix(db: LocalDB, period: str) -> dict[str, float]:
     return {cat: round(val / total, 4) for cat, val in agg.items()} if total else {}
 
 
-def calc_consolidado(branch_kpis: list[BranchKPI]) -> dict:
+def calc_corporate_overhead(db: "LocalDB", period: str) -> tuple[float, float]:
+    """Returns (corporate_gastos, corporate_nomina) excluding Gastos Financieros.
+
+    Corporativo overhead is not allocated to branches but must be subtracted
+    from the consolidated EBITDA to match the official Estado de Resultados.
+    """
+    mes_col_gastos = "MES GASTO" if "MES GASTO" in db.gastos.columns else "MES"
+    gastos_p = _filter_period(db.gastos, period, mes_col=mes_col_gastos)
+    if "CATEGORÍA GASTO" in gastos_p.columns:
+        gastos_p = gastos_p[gastos_p["CATEGORÍA GASTO"] != "Gastos Financieros"]
+    corp_gastos = gastos_p[gastos_p["SUCURSAL"] == "Corporativo"]["SUBTOTAL"].sum()
+
+    mes_col_nom = "MES NÓMINA" if "MES NÓMINA" in db.nomina.columns else "MES"
+    nomina_p = _filter_period(db.nomina, period, mes_col=mes_col_nom)
+    corp_nomina = nomina_p[nomina_p["SUCURSAL"] == "Corporativo"]["SUBTOTAL"].sum()
+
+    return float(corp_gastos), float(corp_nomina)
+
+
+def calc_consolidado(branch_kpis: list[BranchKPI],
+                     corporate_gastos: float = 0.0,
+                     corporate_nomina: float = 0.0) -> dict:
     ingresos = sum(b.ingresos for b in branch_kpis)
     utilidad = sum(b.utilidad_bruta for b in branch_kpis)
-    ebitda   = sum(b.ebitda for b in branch_kpis)
-    nomina   = sum(b.nomina for b in branch_kpis)
-    gastos   = sum(b.gastos_operativos for b in branch_kpis)
+    nomina   = sum(b.nomina for b in branch_kpis) + corporate_nomina
+    gastos   = sum(b.gastos_operativos for b in branch_kpis) + corporate_gastos
+    # EBITDA = branch contributions minus unallocated corporate overhead
+    ebitda   = utilidad - nomina - gastos
     return {
         "ingresos_total": ingresos,
         "utilidad_bruta_total": utilidad,
@@ -196,15 +234,44 @@ def calc_consolidado(branch_kpis: list[BranchKPI]) -> dict:
     }
 
 
+def calc_category_kpis(db: LocalDB, period: str) -> list[CategoryKPI]:
+    """Full category aggregation — all rows, not just top-N products."""
+    bd = _filter_period(db.bd, period)
+    agg = (
+        bd.groupby("SUBCATEGORÍA 1")
+        .agg(
+            ingresos=("SUBTOTAL", "sum"),
+            costo=("COSTO TOTAL SIN IVA", "sum"),
+        )
+        .reset_index()
+    )
+    total = agg["ingresos"].sum()
+    result = []
+    for _, r in agg.iterrows():
+        ing = float(r["ingresos"])
+        costo = float(r["costo"])
+        result.append(CategoryKPI(
+            categoria=str(r["SUBCATEGORÍA 1"]),
+            ingresos=ing,
+            costo=costo,
+            margen_bruto=(ing - costo) / ing if ing else 0.0,
+            pct_total_ingresos=ing / total if total else 0.0,
+        ))
+    return sorted(result, key=lambda x: x.ingresos, reverse=True)
+
+
 def build_period_kpis(db: LocalDB, period: str) -> PeriodKPIs:
-    branch_kpis   = calc_branch_kpis(db, period)
+    branch_kpis    = calc_branch_kpis(db, period)
     top_productos  = calc_top_products(db, period)
     mix            = calc_category_mix(db, period)
-    consolidado    = calc_consolidado(branch_kpis)
+    corp_g, corp_n = calc_corporate_overhead(db, period)
+    consolidado    = calc_consolidado(branch_kpis, corp_g, corp_n)
+    por_categoria  = calc_category_kpis(db, period)
     return PeriodKPIs(
         period=period,
         consolidado=consolidado,
         por_sucursal=branch_kpis,
         top_productos=top_productos,
         pct_mix_categoria=mix,
+        por_categoria=por_categoria,
     )

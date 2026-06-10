@@ -19,18 +19,39 @@ QUANT_KPIS = {
     "consolidado": {
         "ebitda_total": 2_000_000.0,
         "ingresos_total": 10_000_000.0,
+        "nomina_total": 1_200_000.0,
     },
     "por_categoria": [
-        {"categoria": "MAKIS",    "ingresos": 5_000_000.0, "costo": 1_500_000.0, "margen_bruto": 0.70, "pct_total_ingresos": 0.50},
-        {"categoria": "BEBIDAS",  "ingresos": 3_000_000.0, "costo":   900_000.0, "margen_bruto": 0.70, "pct_total_ingresos": 0.30},
-        {"categoria": "DESTILADOS","ingresos": 2_000_000.0,"costo":   800_000.0, "margen_bruto": 0.60, "pct_total_ingresos": 0.20},
+        {"categoria": "MAKIS",     "ingresos": 5_000_000.0, "costo": 1_500_000.0, "margen_bruto": 0.70, "pct_total_ingresos": 0.50},
+        {"categoria": "BEBIDAS",   "ingresos": 3_000_000.0, "costo":   900_000.0, "margen_bruto": 0.70, "pct_total_ingresos": 0.30},
+        {"categoria": "DESTILADOS","ingresos": 2_000_000.0, "costo":   800_000.0, "margen_bruto": 0.60, "pct_total_ingresos": 0.20},
     ],
     "por_sucursal": [
-        {"sucursal": "ANT", "ebitda": 900_000.0,   "ingresos": 3_500_000.0},
-        {"sucursal": "SOK", "ebitda": 700_000.0,   "ingresos": 2_500_000.0},
-        {"sucursal": "MOR", "ebitda": -100_000.0,  "ingresos": 500_000.0},
-        {"sucursal": "CAM", "ebitda": 300_000.0,   "ingresos": 2_000_000.0},
-        {"sucursal": "JUR", "ebitda": 200_000.0,   "ingresos": 1_500_000.0},
+        {
+            "sucursal": "ANT", "ebitda": 900_000.0, "ingresos": 3_500_000.0,
+            "nomina": 400_000.0, "gastos_operativos": 200_000.0,
+            "margen_bruto": 0.69, "ticket_promedio": 500.0, "transacciones": 7_000,
+        },
+        {
+            "sucursal": "SOK", "ebitda": 700_000.0, "ingresos": 2_500_000.0,
+            "nomina": 350_000.0, "gastos_operativos": 150_000.0,
+            "margen_bruto": 0.68, "ticket_promedio": 420.0, "transacciones": 5_952,
+        },
+        {
+            "sucursal": "MOR", "ebitda": -100_000.0, "ingresos": 500_000.0,
+            "nomina": 200_000.0, "gastos_operativos": 80_000.0,
+            "margen_bruto": 0.56, "ticket_promedio": 250.0, "transacciones": 2_000,
+        },
+        {
+            "sucursal": "CAM", "ebitda": 300_000.0, "ingresos": 2_000_000.0,
+            "nomina": 150_000.0, "gastos_operativos": 100_000.0,
+            "margen_bruto": 0.275, "ticket_promedio": 380.0, "transacciones": 5_263,
+        },
+        {
+            "sucursal": "JUR", "ebitda": 200_000.0, "ingresos": 1_500_000.0,
+            "nomina": 100_000.0, "gastos_operativos": 70_000.0,
+            "margen_bruto": 0.245, "ticket_promedio": 300.0, "transacciones": 5_000,
+        },
     ],
 }
 

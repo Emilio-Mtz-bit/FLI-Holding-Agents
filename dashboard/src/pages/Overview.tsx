@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import Markdown from 'react-markdown';
 import { useAnalysisStore } from '@/store/analysis';
 import MetricCard from '@/components/MetricCard';
 import { compact, pct } from '@/lib/format';
@@ -73,7 +74,7 @@ function ContextBox({ label, value }: { label: string; value: string }) {
   return (
     <div className="border-t-2 border-yellow-700 pt-3 space-y-1">
       <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{label}</p>
-      <p className="text-sm font-mono leading-relaxed">{value}</p>
+      <p className="text-sm leading-relaxed">{value}</p>
     </div>
   );
 }
@@ -288,7 +289,9 @@ export default function Overview() {
       <Card>
         <CardHeader><CardTitle>Executive Summary</CardTitle></CardHeader>
         <CardContent>
-          <p className="text-sm leading-relaxed">{result.quant.narrative}</p>
+          <div className="text-sm leading-relaxed [&_strong]:font-semibold [&_p]:mb-2 [&_p:last-child]:mb-0">
+            <Markdown>{result.quant.narrative}</Markdown>
+          </div>
         </CardContent>
       </Card>
 

@@ -24,5 +24,5 @@ def load(xlsx_path: str, year: int) -> RawData:
     bd       = pd.read_excel(xlsx_path, sheet_name=f"BD {year}")
     gastos   = pd.read_excel(xlsx_path, sheet_name=f"GASTOS {year}")
     nomina   = pd.read_excel(xlsx_path, sheet_name=f"NÓMINA {year}")
-    er_nivel = pd.read_excel(xlsx_path, sheet_name=f"ER nivel 1 {year}")
+    er_nivel = pd.read_excel(xlsx_path, sheet_name=f"ER nivel 2 {year}")
     return RawData(bd=bd, gastos=gastos, nomina=nomina, er_nivel=er_nivel)

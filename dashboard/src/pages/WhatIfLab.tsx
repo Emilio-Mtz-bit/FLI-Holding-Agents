@@ -84,7 +84,7 @@ export default function WhatIfLab() {
               <Plus size={14} className="mr-1" /> Add Scenario
             </Button>
           </SheetTrigger>
-          <SheetContent>
+          <SheetContent className="p-6">
             <SheetHeader>
               <SheetTitle>New Custom Scenario</SheetTitle>
             </SheetHeader>

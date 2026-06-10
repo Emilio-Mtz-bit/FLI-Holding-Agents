@@ -20,7 +20,7 @@ import pandas as pd
 
 class LocalDB(NamedTuple):
     """Holds the four cleaned DataFrames produced by pipeline/cleaning.py."""
-    bd: pd.DataFrame       # transaccional — SUBTOTAL > 0 already filtered
+    bd: pd.DataFrame       # transaccional — all rows
     gastos: pd.DataFrame   # gastos operativos
     nomina: pd.DataFrame   # nómina por concepto
     er_nivel: pd.DataFrame # estado de resultados por nivel
@@ -195,6 +195,43 @@ def calc_category_mix(db: LocalDB, period: str) -> dict[str, float]:
     return {cat: round(val / total, 4) for cat, val in agg.items()} if total else {}
 
 
+def read_er_metrics(er_nivel: pd.DataFrame, period: str) -> dict:
+    """Extract key P&L metrics from the ER nivel sheet for a given period.
+
+    Returns dict with ebitda, utilidad_bruta, gastos_operacion_total, nomina,
+    gastos_financieros, utilidad_neta, ingresos_total. Returns {} if period not found.
+    """
+    header_row = er_nivel.iloc[0]
+    period_col = None
+    for col, val in header_row.items():
+        if isinstance(val, str) and val.strip().upper() == period.strip().upper():
+            period_col = col
+            break
+    if period_col is None:
+        return {}
+
+    label_col = er_nivel.columns[0]
+
+    def _get(label: str) -> float:
+        mask = er_nivel[label_col].astype(str).str.strip() == label
+        rows = er_nivel[mask]
+        if rows.empty:
+            return 0.0
+        val = rows.iloc[0][period_col]
+        return float(val) if pd.notna(val) else 0.0
+
+    ingresos = _get("UTILIDAD BRUTA") + _get("Total COSTO DE LO VENDIDO")
+    return {
+        "ingresos_total":         ingresos,
+        "utilidad_bruta_total":   _get("UTILIDAD BRUTA"),
+        "nomina_total":           _get("NÓMINA"),
+        "gastos_operacion_total": _get("Total GASTOS DE OPERACIÓN"),
+        "ebitda_total":           _get("EBITDA"),
+        "gastos_financieros":     _get("GASTOS FINANCIEROS"),
+        "utilidad_neta":          _get("Utilidad (ó Pérdida)"),
+    }
+
+
 def calc_corporate_overhead(db: "LocalDB", period: str) -> tuple[float, float]:
     """Returns (corporate_gastos, corporate_nomina) excluding Gastos Financieros.
 
@@ -268,6 +305,27 @@ def build_period_kpis(db: LocalDB, period: str) -> PeriodKPIs:
     corp_g, corp_n = calc_corporate_overhead(db, period)
     consolidado    = calc_consolidado(branch_kpis, corp_g, corp_n)
     por_categoria  = calc_category_kpis(db, period)
+
+    # Override consolidated P&L with official ER values when available
+    er = read_er_metrics(db.er_nivel, period)
+    if er:
+        ing = er["ingresos_total"]
+        ebitda = er["ebitda_total"]
+        utilidad = er["utilidad_bruta_total"]
+        nomina = er["nomina_total"]
+        gastos = er["gastos_operacion_total"] - nomina
+        consolidado.update({
+            "ingresos_total":              ing,
+            "utilidad_bruta_total":        utilidad,
+            "ebitda_total":                ebitda,
+            "margen_bruto_global":         utilidad / ing if ing else 0.0,
+            "margen_ebitda_global":        ebitda / ing if ing else 0.0,
+            "nomina_total":                nomina,
+            "gastos_operativos_total":     gastos,
+            "pct_nomina_ingresos_global":  nomina / ing if ing else 0.0,
+            "gastos_financieros":          er["gastos_financieros"],
+            "utilidad_neta":               er["utilidad_neta"],
+        })
     return PeriodKPIs(
         period=period,
         consolidado=consolidado,

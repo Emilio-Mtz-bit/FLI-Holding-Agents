@@ -68,9 +68,6 @@ def _clean_bd(df: pd.DataFrame) -> pd.DataFrame:
     # 3. Normalize MES: strip whitespace, uppercase
     df["MES"] = df["MES"].str.strip().str.upper()
 
-    # 4. Keep only rows with actual sales
-    df = df[df["SUBTOTAL"] > 0].copy()
-
     return df
 
 
@@ -84,10 +81,7 @@ def _clean_gastos(df: pd.DataFrame) -> pd.DataFrame:
     # 2. Drop always-empty TOTAL column if present
     df = df.drop(columns=["TOTAL"], errors="ignore")
 
-    # 3. Map sucursal codes → 3-letter names (Corporativo passes through unchanged)
-    df["SUCURSAL"] = df["SUCURSAL"].map(lambda x: _XL_TO_CSV.get(str(x).strip(), x))
-
-    # 4. Derive MES GASTO from FECHA GASTO when column is absent
+    # 3. Derive MES GASTO from FECHA GASTO when column is absent
     if "MES GASTO" not in df.columns:
         df["MES GASTO"] = (
             df["FECHA GASTO"]
@@ -111,10 +105,7 @@ def _clean_nomina(df: pd.DataFrame) -> pd.DataFrame:
     # 3. Drop unused columns
     df = df.drop(columns=["Unnamed: 4", "CONCEPTO", "TOTAL"], errors="ignore")
 
-    # 4. Map sucursal codes → 3-letter names
-    df["SUCURSAL"] = df["SUCURSAL"].map(lambda x: _XL_TO_CSV.get(str(x).strip(), x))
-
-    # 5. Derive MES NÓMINA from FECHA NÓMINA when column is absent
+    # 4. Derive MES NÓMINA from FECHA NÓMINA when column is absent
     if "MES NÓMINA" not in df.columns:
         df["MES NÓMINA"] = (
             df["FECHA NÓMINA"]

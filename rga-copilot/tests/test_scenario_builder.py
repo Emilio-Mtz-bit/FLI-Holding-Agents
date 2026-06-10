@@ -9,6 +9,7 @@ from agents.synth.scenario_builder import (
     build_scenario_cierre_sucursal,
     build_scenario_shift_mix,
     build_scenario_reduccion_nomina,
+    build_scenario_incremento_salarial,
     build_default_scenarios,
 )
 
@@ -114,6 +115,16 @@ def test_reduccion_nomina_impact():
 def test_reduccion_nomina_unknown_sucursal():
     with pytest.raises(ValueError, match="Sucursal"):
         build_scenario_reduccion_nomina(Q, sucursal="ZZZ")
+
+
+def test_incremento_salarial_impact():
+    # consolidado nomina_total = 1_200_000; 10% increase → -120_000 impact
+    sc = build_scenario_incremento_salarial(Q, delta_pct=0.10)
+    assert sc.variable == "incremento_salarial"
+    assert sc.affected_target == "todas las sucursales"
+    assert sc.impact_on_ebitda == pytest.approx(-120_000.0)
+    assert sc.ebitda_post == pytest.approx(1_880_000.0)
+    assert sc.base_ebitda == pytest.approx(2_000_000.0)
 
 
 def test_break_even_result_model():

@@ -140,6 +140,27 @@ def build_scenario_reduccion_nomina(
     )
 
 
+def build_scenario_incremento_salarial(
+    quant,
+    delta_pct: float = 0.10,
+) -> Scenario:
+    """Mandatory salary increase applied to all branches — negative EBITDA impact."""
+    kpis = quant.kpis
+    base_ebitda  = kpis["consolidado"]["ebitda_total"]
+    nomina_total = kpis["consolidado"]["nomina_total"]
+    impact = -nomina_total * delta_pct   # cost increase → negative
+
+    return Scenario(
+        name=f"Incremento salarial +{delta_pct:.0%} (todas las sucursales)",
+        variable="incremento_salarial",
+        delta_pct=delta_pct,
+        affected_target="todas las sucursales",
+        base_ebitda=base_ebitda,
+        impact_on_ebitda=impact,
+        ebitda_post=base_ebitda + impact,
+    )
+
+
 def build_default_scenarios(quant) -> list[Scenario]:
     """
     Build three predefined scenarios using real data to pick relevant targets:

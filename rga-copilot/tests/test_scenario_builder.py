@@ -96,11 +96,21 @@ def test_scenario_shift_mix_impact():
     assert sc.ebitda_post == pytest.approx(2_100_000.0)
 
 
-def test_build_default_scenarios_returns_three():
+def test_build_default_scenarios_returns_five():
     scenarios = build_default_scenarios(Q)
-    assert len(scenarios) == 3
+    assert len(scenarios) == 5
     variables = {s.variable for s in scenarios}
-    assert variables == {"costo_insumo", "cierre_sucursal", "shift_mix"}
+    assert variables == {
+        "costo_insumo", "cierre_sucursal", "shift_mix",
+        "reduccion_nomina", "incremento_salarial",
+    }
+
+
+def test_build_default_scenarios_reduccion_picks_highest_nomina_ratio():
+    scenarios = build_default_scenarios(Q)
+    reduccion = next(s for s in scenarios if s.variable == "reduccion_nomina")
+    # MOR has highest nomina/ingresos = 0.40
+    assert reduccion.affected_target == "MOR"
 
 
 def test_reduccion_nomina_impact():

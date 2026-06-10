@@ -206,13 +206,15 @@ def solve_break_even_ticket(
 
 def build_default_scenarios(quant) -> list[Scenario]:
     """
-    Build three predefined scenarios using real data to pick relevant targets:
+    Build five predefined scenarios using real data to pick relevant targets:
     1. Raise cost of the highest-cost category by 15%.
     2. Close the branch with the lowest (possibly negative) EBITDA.
     3. Shift 5% of revenue from lowest-margin category → highest-margin category.
+    4. Reduce payroll 10% at the branch with the highest nomina/ingresos ratio.
+    5. Mandatory 10% salary increase across all branches.
     """
     kpis = quant.kpis
-    cats = kpis["por_categoria"]
+    cats     = kpis["por_categoria"]
     branches = kpis["por_sucursal"]
 
     if not cats:
@@ -236,4 +238,14 @@ def build_default_scenarios(quant) -> list[Scenario]:
         cat_from, cat_to = cats[0]["categoria"], cats[-1]["categoria"]
     sc3 = build_scenario_shift_mix(quant, cat_from=cat_from, cat_to=cat_to, delta_pct=0.05)
 
-    return [sc1, sc2, sc3]
+    # Scenario 4: reducción nómina — branch with highest nomina/ingresos ratio
+    most_bloated = max(
+        branches,
+        key=lambda b: b["nomina"] / b["ingresos"] if b["ingresos"] else 0.0,
+    )["sucursal"]
+    sc4 = build_scenario_reduccion_nomina(quant, sucursal=most_bloated, delta_pct=0.10)
+
+    # Scenario 5: mandatory salary increase across all branches
+    sc5 = build_scenario_incremento_salarial(quant, delta_pct=0.10)
+
+    return [sc1, sc2, sc3, sc4, sc5]

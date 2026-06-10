@@ -2,10 +2,7 @@
 pipeline/ingestion.py — reads raw source files, returns RawData.
 
 Usage:
-    raw = load(
-        csv_path="TEC SG 2 - Grupo Nama (Interno) - BD 2026.csv",
-        xlsx_path="TEC SG - GN (Interno).xlsx",
-    )
+    raw = load(xlsx_path="TEC SG - GN (Interno).xlsx", year=2026)
 """
 
 from __future__ import annotations
@@ -17,13 +14,15 @@ import pandas as pd
 
 @dataclass
 class RawData:
-    bd: pd.DataFrame      # from CSV — all columns as strings
-    gastos: pd.DataFrame  # from xlsx GASTOS 2026
-    nomina: pd.DataFrame  # from xlsx NÓMINA 2026
+    bd: pd.DataFrame        # from xlsx BD {year}
+    gastos: pd.DataFrame    # from xlsx GASTOS {year}
+    nomina: pd.DataFrame    # from xlsx NÓMINA {year}
+    er_nivel: pd.DataFrame  # from xlsx ER NIVEL {year}
 
 
-def load(csv_path: str, xlsx_path: str) -> RawData:
-    bd = pd.read_csv(csv_path, dtype=str)
-    gastos = pd.read_excel(xlsx_path, sheet_name="GASTOS 2026")
-    nomina = pd.read_excel(xlsx_path, sheet_name="NÓMINA 2026")
-    return RawData(bd=bd, gastos=gastos, nomina=nomina)
+def load(xlsx_path: str, year: int) -> RawData:
+    bd       = pd.read_excel(xlsx_path, sheet_name=f"BD {year}")
+    gastos   = pd.read_excel(xlsx_path, sheet_name=f"GASTOS {year}")
+    nomina   = pd.read_excel(xlsx_path, sheet_name=f"NÓMINA {year}")
+    er_nivel = pd.read_excel(xlsx_path, sheet_name=f"ER nivel 1 {year}")
+    return RawData(bd=bd, gastos=gastos, nomina=nomina, er_nivel=er_nivel)

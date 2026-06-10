@@ -5,7 +5,7 @@ Usage:
     from agents.quant.agent import QuantAgent
     from agents.quant.kpi_calculator import LocalDB
 
-    db = LocalDB(bd=bd_df, gastos=gastos_df, nomina=nomina_df)
+    db = LocalDB(bd=bd_df, gastos=gastos_df, nomina=nomina_df, er_nivel=er_nivel_df)
     result = QuantAgent(company="Grupo Nama").run(period="ENERO 2026", db=db)
 
 Output: QuantOutput (Pydantic model)

@@ -38,6 +38,7 @@ def clean(raw: RawData) -> LocalDB:
         bd=_clean_bd(raw.bd),
         gastos=_clean_gastos(raw.gastos),
         nomina=_clean_nomina(raw.nomina),
+        er_nivel=raw.er_nivel.copy(),
     )
 
 

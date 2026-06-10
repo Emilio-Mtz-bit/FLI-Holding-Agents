@@ -4,8 +4,7 @@ Run from rga-copilot/: .venv/bin/python scripts/smoke_test_synth.py
 
 Requires:
   - .env with ANTHROPIC_API_KEY
-  - ../TEC SG - GN (Interno).xlsx
-  - ../TEC SG 2 - Grupo Nama (Interno) - BD 2026.csv
+  - ../TEC SG - GN (Interno).xlsx  (sheets: BD 2026, GASTOS 2026, NÓMINA 2026, ER NIVEL 2026)
 """
 
 import io
@@ -19,15 +18,15 @@ sys.path.insert(0, os.path.dirname(__file__) + "/..")
 
 from orchestrator import run_analysis
 
-CSV  = "../TEC SG 2 - Grupo Nama (Interno) - BD 2026.csv"
-XLSX = "../TEC SG - GN (Interno).xlsx"
-QUAL = ["agents/qual/Grupo_NAMA_Overview_RGA.md"]
+XLSX   = "../TEC SG - GN (Interno).xlsx"
+YEAR   = 2026
+QUAL   = ["agents/qual/Grupo_NAMA_Overview_RGA.md"]
 PERIOD = "ENERO 2026"
 
 print(f"Running full pipeline for {PERIOD}...")
 result = run_analysis(
-    csv_path=CSV,
     xlsx_path=XLSX,
+    year=YEAR,
     qual_docs=QUAL,
     period=PERIOD,
 )

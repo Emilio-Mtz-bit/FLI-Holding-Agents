@@ -19,10 +19,11 @@ import pandas as pd
 # ---------------------------------------------------------------------------
 
 class LocalDB(NamedTuple):
-    """Holds the three cleaned DataFrames produced by pipeline/cleaning.py."""
+    """Holds the four cleaned DataFrames produced by pipeline/cleaning.py."""
     bd: pd.DataFrame       # transaccional — SUBTOTAL > 0 already filtered
     gastos: pd.DataFrame   # gastos operativos
     nomina: pd.DataFrame   # nómina por concepto
+    er_nivel: pd.DataFrame # estado de resultados por nivel
 
 
 # ---------------------------------------------------------------------------

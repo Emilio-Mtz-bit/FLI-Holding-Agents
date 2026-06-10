@@ -21,7 +21,8 @@ def _make_db() -> LocalDB:
     })
     gastos = pd.DataFrame({"MES GASTO": [], "SUCURSAL": [], "SUBTOTAL": []})
     nomina = pd.DataFrame({"MES NÓMINA": [], "SUCURSAL": [], "SUBTOTAL": []})
-    return LocalDB(bd=bd, gastos=gastos, nomina=nomina)
+    er_nivel = pd.DataFrame()
+    return LocalDB(bd=bd, gastos=gastos, nomina=nomina, er_nivel=er_nivel)
 
 
 def test_calc_category_kpis_returns_correct_count():

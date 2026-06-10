@@ -1,10 +1,10 @@
 """
 Orchestrator — top-level entry point for the RGA Copilot pipeline.
 
-run_analysis(csv_path, xlsx_path, qual_docs, period) → AnalysisResult
+run_analysis(xlsx_path, year, qual_docs, period) → AnalysisResult
 
 Pipeline:
-    load(csv, xlsx) → RawData
+    load(xlsx, year) → RawData
     clean(raw) → LocalDB
     QuantAgent.run(period, db) → QuantOutput
     _normalize_alerts(quant.alerts) → list[QualAlert]   ← Alert model adapter
@@ -68,8 +68,8 @@ def _normalize_alerts(quant_alerts: list[QuantAlert]) -> list[QualAlert]:
 # ---------------------------------------------------------------------------
 
 def run_analysis(
-    csv_path: str,
     xlsx_path: str,
+    year: int,
     qual_docs: list[str],
     period: str,
     company: str = "Grupo Nama",
@@ -81,8 +81,9 @@ def run_analysis(
     Full analysis pipeline.
 
     Args:
-        csv_path: Path to BD 2026 CSV file.
-        xlsx_path: Path to GASTOS/NÓMINA Excel file.
+        xlsx_path: Path to Excel file with sheets BD {year}, GASTOS {year},
+                   NÓMINA {year}, ER NIVEL {year}.
+        year: The fiscal year (e.g. 2026) used to select sheet names.
         qual_docs: List of file paths (PDF, image, text) for qualitative analysis.
         period: Period string, e.g. "ENERO 2026".
         company: Client name for narratives.
@@ -95,8 +96,8 @@ def run_analysis(
     if schema_path is None:
         schema_path = str(Path(__file__).parent / "agents" / "qual" / "config" / "nama_signals.yaml")
 
-    logger.info("Orchestrator: loading data for period=%s", period)
-    raw = load(csv_path, xlsx_path)
+    logger.info("Orchestrator: loading data for period=%s year=%d", period, year)
+    raw = load(xlsx_path, year)
     db  = clean(raw)
 
     logger.info("Orchestrator: running QuantAgent")

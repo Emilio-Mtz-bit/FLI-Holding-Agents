@@ -96,8 +96,8 @@ def test_run_analysis_wires_all_agents(tmp_path):
         MockSynth.return_value.run.return_value = mock_synth_out
 
         result = run_analysis(
-            csv_path="fake.csv",
             xlsx_path="fake.xlsx",
+            year=2026,
             qual_docs=[],
             period="ENERO 2026",
         )

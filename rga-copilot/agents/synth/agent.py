@@ -47,11 +47,16 @@ class SynthAgent:
 
     # ------------------------------------------------------------------
 
-    def run(self, quant: QuantOutput, qual: QualOutput) -> SynthOutput:
+    def run(
+        self,
+        quant: QuantOutput,
+        qual: QualOutput,
+        break_even_target_ebitda: float = 1_500_000.0,
+    ) -> SynthOutput:
         signals, next_steps = self._extract_signals(quant, qual)
         scenarios = build_default_scenarios(quant)
         recommendations = self._derive_recommendations(signals)
-        break_even_results = self._solve_break_even_all(quant)
+        break_even_results = self._solve_break_even_all(quant, break_even_target_ebitda)
         html = self._memo_gen.render_html(
             company=self._company,
             period=quant.period,
@@ -77,12 +82,12 @@ class SynthAgent:
         )
 
     @staticmethod
-    def _solve_break_even_all(quant: QuantOutput):
+    def _solve_break_even_all(quant: QuantOutput, target_ebitda: float = 1_500_000.0):
         results = []
         for branch in quant.kpis.get("por_sucursal", []):
             try:
                 results.append(
-                    solve_break_even_ticket(quant, sucursal=branch["sucursal"], target_ebitda=0.0)
+                    solve_break_even_ticket(quant, sucursal=branch["sucursal"], target_ebitda=target_ebitda)
                 )
             except ValueError:
                 pass

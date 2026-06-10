@@ -173,7 +173,7 @@
   </tr>
   {% endfor %}
 </table>
-<p style="font-size:9pt;color:#666;">* Ticket requerido para alcanzar EBITDA = $0 por sucursal, manteniendo margen bruto % y transacciones constantes.</p>
+<p style="font-size:9pt;color:#666;">* Ticket requerido para alcanzar EBITDA objetivo = ${{ "{:,.0f}".format(break_even_results[0]["target_ebitda"]) }} por sucursal, manteniendo margen bruto % y transacciones constantes.</p>
 {% endif %}
 
 <!-- ====================================================== -->

@@ -76,6 +76,7 @@ def run_analysis(
     chroma_persist_path: str = "data/vector_store",
     memo_out_dir: str = "data/outputs",
     schema_path: str | None = None,
+    break_even_target_ebitda: float = 1_500_000.0,
 ) -> AnalysisResult:
     """
     Full analysis pipeline.
@@ -128,6 +129,6 @@ def run_analysis(
         claude_client=claude_client,
         memo_out_dir=memo_out_dir,
     )
-    synth = synth_agent.run(quant, qual)
+    synth = synth_agent.run(quant, qual, break_even_target_ebitda=break_even_target_ebitda)
 
     return AnalysisResult(period=period, quant=quant, qual=qual, synth=synth)

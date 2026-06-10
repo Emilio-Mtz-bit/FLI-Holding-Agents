@@ -8,6 +8,7 @@ from agents.synth.scenario_builder import (
     build_scenario_costo_insumo,
     build_scenario_cierre_sucursal,
     build_scenario_shift_mix,
+    build_scenario_reduccion_nomina,
     build_default_scenarios,
 )
 
@@ -98,6 +99,21 @@ def test_build_default_scenarios_returns_three():
     assert len(scenarios) == 3
     variables = {s.variable for s in scenarios}
     assert variables == {"costo_insumo", "cierre_sucursal", "shift_mix"}
+
+
+def test_reduccion_nomina_impact():
+    # ANT nomina = 400_000; 10% reduction → +40_000 impact
+    sc = build_scenario_reduccion_nomina(Q, sucursal="ANT", delta_pct=0.10)
+    assert sc.variable == "reduccion_nomina"
+    assert sc.affected_target == "ANT"
+    assert sc.impact_on_ebitda == pytest.approx(40_000.0)
+    assert sc.ebitda_post == pytest.approx(2_040_000.0)
+    assert sc.base_ebitda == pytest.approx(2_000_000.0)
+
+
+def test_reduccion_nomina_unknown_sucursal():
+    with pytest.raises(ValueError, match="Sucursal"):
+        build_scenario_reduccion_nomina(Q, sucursal="ZZZ")
 
 
 def test_break_even_result_model():

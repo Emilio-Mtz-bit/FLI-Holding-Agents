@@ -113,6 +113,33 @@ def build_scenario_shift_mix(
     )
 
 
+def build_scenario_reduccion_nomina(
+    quant,
+    sucursal: str,
+    delta_pct: float = 0.10,
+) -> Scenario:
+    """Reduce payroll at `sucursal` by `delta_pct` — positive EBITDA impact."""
+    kpis = quant.kpis
+    base_ebitda = kpis["consolidado"]["ebitda_total"]
+
+    branch_map = {b["sucursal"]: b for b in kpis["por_sucursal"]}
+    if sucursal not in branch_map:
+        raise ValueError(f"Sucursal '{sucursal}' not found. Available: {list(branch_map)}")
+
+    nomina_sucursal = branch_map[sucursal]["nomina"]
+    impact = nomina_sucursal * delta_pct   # saving → positive
+
+    return Scenario(
+        name=f"Reducción nómina {sucursal} -{delta_pct:.0%}",
+        variable="reduccion_nomina",
+        delta_pct=delta_pct,
+        affected_target=sucursal,
+        base_ebitda=base_ebitda,
+        impact_on_ebitda=impact,
+        ebitda_post=base_ebitda + impact,
+    )
+
+
 def build_default_scenarios(quant) -> list[Scenario]:
     """
     Build three predefined scenarios using real data to pick relevant targets:

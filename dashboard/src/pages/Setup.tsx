@@ -94,11 +94,11 @@ export default function Setup() {
           <div className="space-y-2">
             <Label>
               Qual Documents{' '}
-              <span className="text-muted-foreground text-xs">(optional — PDF, images)</span>
+              <span className="text-muted-foreground text-xs">(optional — PDF, images, markdown)</span>
             </Label>
             <FileDropZone
-              label="PDF or image files"
-              accept=".pdf,.png,.jpg,.jpeg"
+              label="PDF, image, or .md files"
+              accept=".pdf,.png,.jpg,.jpeg,.md"
               multiple={true}
               files={qualFiles}
               onChange={setQualFiles}

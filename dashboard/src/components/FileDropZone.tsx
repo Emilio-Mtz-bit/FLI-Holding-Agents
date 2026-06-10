@@ -20,6 +20,7 @@ function FileIcon({ name }: { name: string }) {
   if (ext === 'xlsx') return <FileSpreadsheet size={16} className="text-emerald-500 flex-shrink-0" />;
   if (ext === 'pdf') return <FileText size={16} className="text-rose-500 flex-shrink-0" />;
   if (['png', 'jpg', 'jpeg'].includes(ext ?? '')) return <Image size={16} className="text-blue-500 flex-shrink-0" />;
+  if (ext === 'md') return <FileText size={16} className="text-violet-500 flex-shrink-0" />;
   return <File size={16} className="text-muted-foreground flex-shrink-0" />;
 }
 

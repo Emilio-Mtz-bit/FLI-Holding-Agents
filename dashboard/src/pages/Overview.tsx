@@ -180,6 +180,8 @@ function SenalesEstrategicas({ signals, sentiment }: { signals: QualSignals; sen
           </div>
         </div>
       )}
+
+      {/* temas_topicos intentionally not displayed — out of scope per spec */}
     </div>
   );
 }
@@ -292,7 +294,7 @@ export default function Overview() {
 
       {/* Qual signals */}
       <SenalesEstrategicas
-        signals={result.qual.signals}
+        signals={result.qual.signals ?? {}}
         sentiment={result.qual.sentiment}
       />
     </div>

@@ -79,9 +79,22 @@ export interface Signal {
   facilidad: 'alta' | 'media' | 'baja';
 }
 
+export interface QualSignals {
+  tipo_empresa?: string;
+  posicionamiento?: string;
+  fortalezas?: string[];
+  riesgos?: string[];
+  factores_crecimiento?: string[];
+  temas_topicos?: string[];
+  sentiment_score?: number;   // range: -1.0 to 1.0
+}
+
 export interface QualOutput {
-  signals: Signal[];
+  signals: QualSignals;
+  sentiment: number;          // range: -1.0 to 1.0
+  hypotheses: string[];
   summary: string;
+  chunks_stored: number;
 }
 
 export interface Scenario {

@@ -23,6 +23,8 @@ data/processed/
 # Vector store
 data/vector_store/
 
-# Tests
+# Tests (ignore rga-copilot tests; allow api/tests)
 tests/
+!api/tests/
+!api/tests/**
 

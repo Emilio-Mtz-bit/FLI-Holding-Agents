@@ -3,7 +3,7 @@ import pytest
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from agents.synth.models import Scenario
+from agents.synth.models import Scenario, BreakEvenResult
 from agents.synth.scenario_builder import (
     build_scenario_costo_insumo,
     build_scenario_cierre_sucursal,
@@ -77,3 +77,18 @@ def test_build_default_scenarios_returns_three():
     assert len(scenarios) == 3
     variables = {s.variable for s in scenarios}
     assert variables == {"costo_insumo", "cierre_sucursal", "shift_mix"}
+
+
+def test_break_even_result_model():
+    r = BreakEvenResult(
+        sucursal="D",
+        target_ebitda=200_000.0,
+        current_ebitda=96_850.0,
+        current_ticket=350.0,
+        required_ticket=425.0,
+        ticket_delta_pct=(425.0 - 350.0) / 350.0,
+        transacciones=1_200,
+    )
+    assert r.sucursal == "D"
+    assert r.required_ticket == pytest.approx(425.0)
+    assert r.ticket_delta_pct == pytest.approx(0.2143, abs=1e-3)

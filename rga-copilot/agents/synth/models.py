@@ -42,6 +42,16 @@ class Scenario(BaseModel):
     ebitda_post: float             # = base_ebitda + impact_on_ebitda
 
 
+class BreakEvenResult(BaseModel):
+    sucursal: str
+    target_ebitda: float        # user-supplied target (MXN)
+    current_ebitda: float       # branch EBITDA for the period
+    current_ticket: float       # avg ticket today (MXN)
+    required_ticket: float      # ticket needed to hit target_ebitda
+    ticket_delta_pct: float     # (required_ticket - current_ticket) / current_ticket
+    transacciones: int          # held fixed in the solve
+
+
 class Recommendation(BaseModel):
     accion: str
     impacto: ImpactLevel

@@ -87,13 +87,13 @@ def test_scenario_cierre_sucursal_negative_ebitda():
 
 
 def test_scenario_shift_mix_impact():
-    # Shift 10% total revenue from DESTILADOS (margen 0.60) → MAKIS (margen 0.70)
-    # delta_revenue = 10_000_000 * 0.10 = 1_000_000
-    # impact = 1_000_000 * (0.70 - 0.60) = 100_000
+    # Shift 10% of DESTILADOS revenue (2_000_000) → MAKIS
+    # delta_revenue = 2_000_000 * 0.10 = 200_000
+    # impact = 200_000 * (0.70 - 0.60) = 20_000
     sc = build_scenario_shift_mix(Q, cat_from="DESTILADOS", cat_to="MAKIS", delta_pct=0.10)
     assert sc.variable == "shift_mix"
-    assert sc.impact_on_ebitda == pytest.approx(100_000.0)
-    assert sc.ebitda_post == pytest.approx(2_100_000.0)
+    assert sc.impact_on_ebitda == pytest.approx(20_000.0)
+    assert sc.ebitda_post == pytest.approx(2_020_000.0)
 
 
 def test_build_default_scenarios_returns_five():

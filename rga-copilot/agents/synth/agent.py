@@ -22,7 +22,7 @@ from agents.quant.agent import QuantOutput
 from agents.qual.models import QualOutput
 from agents.synth.memo_generator import MemoGenerator
 from agents.synth.models import Recommendation, Signal, SynthOutput
-from agents.synth.scenario_builder import build_default_scenarios
+from agents.synth.scenario_builder import build_default_scenarios, solve_break_even_ticket
 
 logger = logging.getLogger(__name__)
 
@@ -51,6 +51,7 @@ class SynthAgent:
         signals, next_steps = self._extract_signals(quant, qual)
         scenarios = build_default_scenarios(quant)
         recommendations = self._derive_recommendations(signals)
+        break_even_results = self._solve_break_even_all(quant)
         html = self._memo_gen.render_html(
             company=self._company,
             period=quant.period,
@@ -58,6 +59,7 @@ class SynthAgent:
             qual_summary=qual.summary,
             signals=signals,
             scenarios=scenarios,
+            break_even_results=break_even_results,
             recommendations=recommendations,
             next_steps=next_steps,
         )
@@ -67,11 +69,24 @@ class SynthAgent:
         return SynthOutput(
             signals=signals,
             scenarios=scenarios,
+            break_even_results=break_even_results,
             recommendations=recommendations,
             next_steps=next_steps,
             memo_html=html,
             memo_pdf_path=html_path,
         )
+
+    @staticmethod
+    def _solve_break_even_all(quant: QuantOutput):
+        results = []
+        for branch in quant.kpis.get("por_sucursal", []):
+            try:
+                results.append(
+                    solve_break_even_ticket(quant, sucursal=branch["sucursal"], target_ebitda=0.0)
+                )
+            except ValueError:
+                pass
+        return results
 
     # ------------------------------------------------------------------
 

@@ -62,6 +62,7 @@ class Recommendation(BaseModel):
 class SynthOutput(BaseModel):
     signals: list[Signal]
     scenarios: list[Scenario]
+    break_even_results: list[BreakEvenResult]
     recommendations: list[Recommendation]
     next_steps: str                # Claude-generated paragraph
     memo_html: str

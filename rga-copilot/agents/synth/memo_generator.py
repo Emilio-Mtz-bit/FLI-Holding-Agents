@@ -13,7 +13,7 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
-from agents.synth.models import Recommendation, Scenario, Signal
+from agents.synth.models import BreakEvenResult, Recommendation, Scenario, Signal
 
 _TEMPLATES_DIR = Path(__file__).parent / "templates"
 
@@ -34,6 +34,7 @@ class MemoGenerator:
         qual_summary: str,
         signals: list[Signal],
         scenarios: list[Scenario],
+        break_even_results: list[BreakEvenResult],
         recommendations: list[Recommendation],
         next_steps: str,
         generated_date: str | None = None,
@@ -47,6 +48,7 @@ class MemoGenerator:
             qual_summary=qual_summary,
             signals=[s.model_dump() for s in signals],
             scenarios=[s.model_dump() for s in scenarios],
+            break_even_results=[r.model_dump() for r in break_even_results],
             recommendations=[r.model_dump() for r in recommendations],
             next_steps=next_steps,
         )

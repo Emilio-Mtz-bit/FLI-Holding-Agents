@@ -77,7 +77,8 @@ def test_run_analysis_wires_all_agents(tmp_path):
                              impact_on_ebitda=-135_000, ebitda_post=865_000)
     fake_rec = Recommendation(accion="R", impacto="alto", facilidad="alta", fuente="signal_1")
     mock_synth_out = SynthOutput(
-        signals=[fake_signal], scenarios=[fake_scenario], recommendations=[fake_rec],
+        signals=[fake_signal], scenarios=[fake_scenario], break_even_results=[],
+        recommendations=[fake_rec],
         next_steps="Paso.", memo_html="<html></html>", memo_pdf_path="/tmp/memo.pdf",
     )
 

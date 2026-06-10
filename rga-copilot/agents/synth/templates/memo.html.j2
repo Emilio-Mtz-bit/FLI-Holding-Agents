@@ -144,7 +144,41 @@
 </table>
 
 <!-- ====================================================== -->
-<h2>4. Recomendaciones Priorizadas</h2>
+{% if break_even_results %}
+<h2>4. Punto de Equilibrio por Sucursal (Ticket Promedio)</h2>
+<table>
+  <tr>
+    <th>Sucursal</th>
+    <th>Ticket Actual (MXN)</th>
+    <th>Ticket Requerido (MXN)</th>
+    <th>Variación Necesaria</th>
+    <th>Transacciones</th>
+    <th>EBITDA Actual (MXN)</th>
+  </tr>
+  {% for r in break_even_results %}
+  {% set delta_pct = r.ticket_delta_pct * 100 %}
+  <tr>
+    <td><strong>{{ r.sucursal }}</strong></td>
+    <td>${{ "{:,.2f}".format(r.current_ticket) }}</td>
+    <td class="{{ 'impact-neg' if r.required_ticket > r.current_ticket else 'impact-pos' }}">
+      ${{ "{:,.2f}".format(r.required_ticket) }}
+    </td>
+    <td class="{{ 'impact-neg' if delta_pct > 0 else 'impact-pos' }}">
+      {{ '+' if delta_pct >= 0 else '' }}{{ "{:.1f}".format(delta_pct) }}%
+    </td>
+    <td>{{ "{:,}".format(r.transacciones) }}</td>
+    <td class="{{ 'impact-pos' if r.current_ebitda >= 0 else 'impact-neg' }}">
+      ${{ "{:,.0f}".format(r.current_ebitda) }}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+<p style="font-size:9pt;color:#666;">* Ticket requerido para alcanzar EBITDA = $0 por sucursal, manteniendo margen bruto % y transacciones constantes.</p>
+{% endif %}
+
+<!-- ====================================================== -->
+<h2>5. Recomendaciones Priorizadas</h2>
+
 <table>
   <tr>
     <th>#</th>
@@ -163,7 +197,7 @@
 </table>
 
 <!-- ====================================================== -->
-<h2>5. Próximos Pasos</h2>
+<h2>6. Próximos Pasos</h2>
 <p>{{ next_steps }}</p>
 
 <!-- ====================================================== -->

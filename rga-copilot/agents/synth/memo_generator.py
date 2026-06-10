@@ -11,6 +11,8 @@ import re
 from datetime import date
 from pathlib import Path
 
+import markdown as _md
+
 from jinja2 import Environment, FileSystemLoader
 
 from agents.synth.models import BreakEvenResult, Recommendation, Scenario, Signal
@@ -24,6 +26,7 @@ class MemoGenerator:
             loader=FileSystemLoader(str(_TEMPLATES_DIR)),
             autoescape=False,
         )
+        self._env.filters['md'] = lambda text: _md.markdown(text or '', extensions=['nl2br'])
 
     def render_html(
         self,

@@ -11,7 +11,7 @@ import re
 from datetime import date
 from pathlib import Path
 
-import markdown as _md
+import markdown
 
 from jinja2 import Environment, FileSystemLoader
 
@@ -26,7 +26,6 @@ class MemoGenerator:
             loader=FileSystemLoader(str(_TEMPLATES_DIR)),
             autoescape=False,
         )
-        self._env.filters['md'] = lambda text: _md.markdown(text or '', extensions=['nl2br'])
 
     def render_html(
         self,
@@ -47,8 +46,8 @@ class MemoGenerator:
             company=company,
             period=period,
             generated_date=generated_date or date.today().isoformat(),
-            quant_narrative=quant_narrative,
-            qual_summary=qual_summary,
+            quant_narrative=markdown.markdown(quant_narrative or '', extensions=['nl2br']),
+            qual_summary=markdown.markdown(qual_summary or '', extensions=['nl2br']),
             signals=[s.model_dump() for s in signals],
             scenarios=[s.model_dump() for s in scenarios],
             break_even_results=[r.model_dump() for r in break_even_results],

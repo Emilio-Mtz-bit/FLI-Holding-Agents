@@ -20,7 +20,7 @@ Scenario 3 — shift_mix:
 
 from __future__ import annotations
 
-from agents.synth.models import Scenario
+from agents.synth.models import BreakEvenResult, Scenario
 
 
 def build_scenario_costo_insumo(
@@ -158,6 +158,49 @@ def build_scenario_incremento_salarial(
         base_ebitda=base_ebitda,
         impact_on_ebitda=impact,
         ebitda_post=base_ebitda + impact,
+    )
+
+
+def solve_break_even_ticket(
+    quant,
+    sucursal: str,
+    target_ebitda: float = 0.0,
+) -> BreakEvenResult:
+    """
+    Solve for the avg ticket a branch needs to reach `target_ebitda`.
+
+    Assumptions: gross margin % and transaction count are held constant.
+    Math: ticket_req = (target_ebitda + gastos + nomina) / (transacciones * margen_bruto)
+    """
+    kpis = quant.kpis
+    branch_map = {b["sucursal"]: b for b in kpis["por_sucursal"]}
+    if sucursal not in branch_map:
+        raise ValueError(f"Sucursal '{sucursal}' not found. Available: {list(branch_map)}")
+
+    b = branch_map[sucursal]
+    transacciones  = b["transacciones"]
+    margen_bruto   = b["margen_bruto"]
+    gastos         = b["gastos_operativos"]
+    nomina         = b["nomina"]
+    current_ticket = b["ticket_promedio"]
+    current_ebitda = b["ebitda"]
+
+    if transacciones == 0:
+        raise ValueError(f"Sucursal '{sucursal}' has transacciones=0; cannot solve.")
+    if margen_bruto == 0:
+        raise ValueError(f"Sucursal '{sucursal}' has margen_bruto=0; cannot solve.")
+
+    required_ticket = (target_ebitda + gastos + nomina) / (transacciones * margen_bruto)
+    ticket_delta_pct = (required_ticket - current_ticket) / current_ticket
+
+    return BreakEvenResult(
+        sucursal=sucursal,
+        target_ebitda=target_ebitda,
+        current_ebitda=current_ebitda,
+        current_ticket=current_ticket,
+        required_ticket=required_ticket,
+        ticket_delta_pct=ticket_delta_pct,
+        transacciones=transacciones,
     )
 
 

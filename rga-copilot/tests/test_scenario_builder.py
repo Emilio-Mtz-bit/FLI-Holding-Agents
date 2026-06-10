@@ -11,6 +11,7 @@ from agents.synth.scenario_builder import (
     build_scenario_reduccion_nomina,
     build_scenario_incremento_salarial,
     build_default_scenarios,
+    solve_break_even_ticket,
 )
 
 # ---------------------------------------------------------------------------
@@ -140,3 +141,46 @@ def test_break_even_result_model():
     assert r.sucursal == "D"
     assert r.required_ticket == pytest.approx(425.0)
     assert r.ticket_delta_pct == pytest.approx(0.2143, abs=1e-3)
+
+
+def test_break_even_ticket_above_current():
+    # MOR: gastos=80_000, nomina=200_000, margen=0.56, transacciones=2_000, ticket=250
+    # ticket_req(target=50_000) = (50_000 + 80_000 + 200_000) / (2_000 * 0.56) = 330_000/1_120 ≈ 294.64
+    r = solve_break_even_ticket(Q, sucursal="MOR", target_ebitda=50_000.0)
+    assert isinstance(r, BreakEvenResult)
+    assert r.sucursal == "MOR"
+    assert r.target_ebitda == pytest.approx(50_000.0)
+    assert r.current_ticket == pytest.approx(250.0)
+    assert r.required_ticket == pytest.approx(294.64, abs=0.1)
+    assert r.ticket_delta_pct == pytest.approx((294.64 - 250.0) / 250.0, abs=1e-2)
+    assert r.transacciones == 2_000
+
+def test_break_even_ticket_zero_transactions_raises():
+    bad_quant_kpis = {
+        "consolidado": {"ebitda_total": 0.0, "nomina_total": 0.0},
+        "por_categoria": [],
+        "por_sucursal": [
+            {"sucursal": "X", "ebitda": 0.0, "ingresos": 0.0,
+             "nomina": 0.0, "gastos_operativos": 0.0,
+             "margen_bruto": 0.5, "ticket_promedio": 0.0, "transacciones": 0},
+        ],
+    }
+    class FakeZero:
+        kpis = bad_quant_kpis
+    with pytest.raises(ValueError, match="transacciones"):
+        solve_break_even_ticket(FakeZero(), sucursal="X", target_ebitda=0.0)
+
+def test_break_even_ticket_zero_margin_raises():
+    bad_quant_kpis = {
+        "consolidado": {"ebitda_total": 0.0, "nomina_total": 0.0},
+        "por_categoria": [],
+        "por_sucursal": [
+            {"sucursal": "X", "ebitda": 0.0, "ingresos": 100_000.0,
+             "nomina": 0.0, "gastos_operativos": 0.0,
+             "margen_bruto": 0.0, "ticket_promedio": 200.0, "transacciones": 500},
+        ],
+    }
+    class FakeZeroMargin:
+        kpis = bad_quant_kpis
+    with pytest.raises(ValueError, match="margen_bruto"):
+        solve_break_even_ticket(FakeZeroMargin(), sucursal="X", target_ebitda=0.0)

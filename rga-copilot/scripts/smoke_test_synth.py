@@ -8,10 +8,12 @@ Requires:
   - ../TEC SG 2 - Grupo Nama (Interno) - BD 2026.csv
 """
 
+import io
 import logging
 import sys
 import os
 
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
 sys.path.insert(0, os.path.dirname(__file__) + "/..")
 
@@ -42,6 +44,6 @@ print(f"\nScenarios:")
 for sc in result.synth.scenarios:
     sign = "+" if sc.impact_on_ebitda >= 0 else ""
     print(f"  {sc.name}: impact ${sign}{sc.impact_on_ebitda:,.0f}")
-print(f"\nMemo PDF: {result.synth.memo_pdf_path}")
-assert os.path.exists(result.synth.memo_pdf_path), "PDF file was not created!"
+print(f"\nMemo HTML: {result.synth.memo_pdf_path}")
+assert os.path.exists(result.synth.memo_pdf_path), "HTML file was not created!"
 print("\nSMOKE TEST PASSED")

@@ -61,7 +61,7 @@ class SynthAgent:
             recommendations=recommendations,
             next_steps=next_steps,
         )
-        pdf_path = self._memo_gen.write_pdf(
+        html_path = self._memo_gen.write_html(
             html, out_dir=self._memo_out_dir, period=quant.period
         )
         return SynthOutput(
@@ -70,7 +70,7 @@ class SynthAgent:
             recommendations=recommendations,
             next_steps=next_steps,
             memo_html=html,
-            memo_pdf_path=pdf_path,
+            memo_pdf_path=html_path,
         )
 
     # ------------------------------------------------------------------

@@ -1,5 +1,5 @@
 """
-MemoGenerator — renders the Jinja2 HTML template and exports to PDF via WeasyPrint.
+MemoGenerator — renders the Jinja2 HTML template and saves to an HTML file.
 
 No LLM calls. Receives pre-computed data from SynthAgent.
 """
@@ -14,14 +14,6 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 
 from agents.synth.models import Recommendation, Scenario, Signal
-
-# Imported at module level so tests can monkeypatch it.
-# WeasyPrint requires system cairo/gobject libs; on macOS set
-# DYLD_LIBRARY_PATH=/opt/homebrew/lib before importing.
-try:
-    from weasyprint import HTML
-except OSError:
-    HTML = None  # type: ignore[assignment,misc]
 
 _TEMPLATES_DIR = Path(__file__).parent / "templates"
 
@@ -59,16 +51,12 @@ class MemoGenerator:
             next_steps=next_steps,
         )
 
-    def write_pdf(self, html: str, *, out_dir: str, period: str) -> str:
-        """Render html → PDF and return absolute file path."""
-        if HTML is None:
-            raise RuntimeError(
-                "WeasyPrint is unavailable (missing system cairo/gobject libs). "
-                "PDF generation is disabled. Set DYLD_LIBRARY_PATH=/opt/homebrew/lib on macOS."
-            )
+    def write_html(self, html: str, *, out_dir: str, period: str) -> str:
+        """Write html to disk and return absolute file path."""
         os.makedirs(out_dir, exist_ok=True)
         safe_period = re.sub(r"\s+", "_", period.upper())
-        filename = f"memo_{safe_period}.pdf"
+        filename = f"memo_{safe_period}.html"
         out_path = os.path.join(out_dir, filename)
-        HTML(string=html).write_pdf(out_path)
+        with open(out_path, "w", encoding="utf-8") as f:
+            f.write(html)
         return out_path

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,18 +9,17 @@ import { useAnalysisStore } from '@/store/analysis';
 import { initScenarioCards } from '@/lib/scenarios';
 import { compact } from '@/lib/format';
 import ProgressBar from '@/components/ProgressBar';
-import { Upload, FileSpreadsheet, FileText } from 'lucide-react';
+import FileDropZone from '@/components/FileDropZone';
+import { Upload } from 'lucide-react';
 
 export default function Setup() {
   const navigate = useNavigate();
-  const xlsxRef = useRef<HTMLInputElement>(null);
-  const docsRef = useRef<HTMLInputElement>(null);
 
   const [period, setPeriod] = useState('ENERO 2026');
   const [year, setYear] = useState(2026);
   const [company, setCompany] = useState('Grupo Nama');
-  const [xlsxName, setXlsxName] = useState<string | null>(null);
-  const [docsCount, setDocsCount] = useState(0);
+  const [xlsxFiles, setXlsxFiles] = useState<File[]>([]);
+  const [qualFiles, setQualFiles] = useState<File[]>([]);
 
   const { status, errorMessage, breakEvenTarget, setJob, setStatus, setResult, setError,
           setBreakEvenTarget, setScenarios } = useAnalysisStore();
@@ -51,20 +50,15 @@ export default function Setup() {
   };
 
   const handleRun = async () => {
-    const xlsxFile = xlsxRef.current?.files?.[0];
-    if (!xlsxFile) return;
+    if (!xlsxFiles[0]) return;
 
     const form = new FormData();
-    form.append('xlsx', xlsxFile);
+    form.append('xlsx', xlsxFiles[0]);
     form.append('period', period);
     form.append('year', String(year));
     form.append('company', company);
     form.append('break_even_target_ebitda', String(breakEvenTarget));
-
-    const qualFiles = docsRef.current?.files;
-    if (qualFiles) {
-      Array.from(qualFiles).forEach((f) => form.append('qual_docs', f));
-    }
+    qualFiles.forEach((f) => form.append('qual_docs', f));
 
     try {
       const res = await fetch('/api/run', { method: 'POST', body: form });
@@ -85,46 +79,30 @@ export default function Setup() {
 
       <Card>
         <CardHeader><CardTitle>Data Files</CardTitle></CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6">
           <div className="space-y-2">
             <Label>Excel File <span className="text-destructive">*</span></Label>
-            <div
-              className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:bg-muted/50 transition-colors"
-              onClick={() => xlsxRef.current?.click()}
-            >
-              <FileSpreadsheet className="mx-auto mb-2 text-muted-foreground" size={32} />
-              <p className="text-sm text-muted-foreground">
-                {xlsxName ?? 'Click to select .xlsx file'}
-              </p>
-              <input
-                ref={xlsxRef}
-                type="file"
-                accept=".xlsx"
-                className="hidden"
-                onChange={(e) => setXlsxName(e.target.files?.[0]?.name ?? null)}
-              />
-            </div>
+            <FileDropZone
+              label=".xlsx file"
+              accept=".xlsx"
+              multiple={false}
+              files={xlsxFiles}
+              onChange={setXlsxFiles}
+            />
           </div>
 
           <div className="space-y-2">
-            <Label>Qual Documents <span className="text-muted-foreground text-xs">(optional — PDF, images)</span></Label>
-            <div
-              className="border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:bg-muted/50 transition-colors"
-              onClick={() => docsRef.current?.click()}
-            >
-              <FileText className="mx-auto mb-2 text-muted-foreground" size={24} />
-              <p className="text-sm text-muted-foreground">
-                {docsCount > 0 ? `${docsCount} file(s) selected` : 'Click to select files'}
-              </p>
-              <input
-                ref={docsRef}
-                type="file"
-                accept=".pdf,.png,.jpg,.jpeg"
-                multiple
-                className="hidden"
-                onChange={(e) => setDocsCount(e.target.files?.length ?? 0)}
-              />
-            </div>
+            <Label>
+              Qual Documents{' '}
+              <span className="text-muted-foreground text-xs">(optional — PDF, images)</span>
+            </Label>
+            <FileDropZone
+              label="PDF or image files"
+              accept=".pdf,.png,.jpg,.jpeg"
+              multiple={true}
+              files={qualFiles}
+              onChange={setQualFiles}
+            />
           </div>
         </CardContent>
       </Card>
@@ -158,11 +136,7 @@ export default function Setup() {
               max={5_000_000}
               step={100_000}
               value={[breakEvenTarget]}
-              onValueChange={(v) => {
-                if (Array.isArray(v)) {
-                  setBreakEvenTarget(v[0]);
-                }
-              }}
+              onValueChange={(v) => { if (Array.isArray(v)) setBreakEvenTarget(v[0]); }}
             />
           </div>
         </CardContent>
@@ -174,7 +148,7 @@ export default function Setup() {
         size="lg"
         className="w-full"
         onClick={handleRun}
-        disabled={status === 'pending' || status === 'running'}
+        disabled={xlsxFiles.length === 0 || status === 'pending' || status === 'running'}
       >
         <Upload size={16} className="mr-2" />
         {status === 'running' ? 'Running Analysis…' : 'Run Analysis'}

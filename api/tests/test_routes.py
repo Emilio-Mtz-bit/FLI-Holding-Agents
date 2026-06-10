@@ -1,7 +1,7 @@
 import io
 
 
-def test_run_returns_job_id(client, tmp_path):
+def test_run_returns_job_id(client):
     # Minimal xlsx-like bytes (real validation not needed for route test)
     fake_xlsx = io.BytesIO(b"PK fake xlsx content")
     response = client.post(
@@ -20,7 +20,7 @@ def test_run_returns_job_id(client, tmp_path):
     assert len(body["job_id"]) == 36
 
 
-def test_run_job_starts_as_pending_or_running(client, tmp_path):
+def test_run_job_starts_as_pending_or_running(client):
     fake_xlsx = io.BytesIO(b"PK fake xlsx content")
     run_resp = client.post(
         "/api/run",

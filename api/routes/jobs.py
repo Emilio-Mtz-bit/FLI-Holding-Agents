@@ -1,7 +1,3 @@
-import sys
-from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
 from fastapi import APIRouter, HTTPException
 from job_store import get_job
 

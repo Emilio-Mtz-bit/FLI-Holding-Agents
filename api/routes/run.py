@@ -1,12 +1,8 @@
 import os
-import sys
 import tempfile
 import threading
-from pathlib import Path
 
 from fastapi import APIRouter, File, Form, UploadFile
-
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "rga-copilot"))
 
 from job_store import create_job, update_job
 
@@ -39,6 +35,7 @@ async def run_analysis(
         qual_paths.append(path)
 
     def _run() -> None:
+        import shutil
         try:
             update_job(job_id, "running")
             from orchestrator import run_analysis as _pipeline
@@ -53,6 +50,8 @@ async def run_analysis(
             update_job(job_id, "done", result=result.model_dump(mode="json"))
         except Exception as exc:
             update_job(job_id, "error", error=str(exc))
+        finally:
+            shutil.rmtree(tmp_dir, ignore_errors=True)
 
     threading.Thread(target=_run, daemon=True).start()
     return {"job_id": job_id}

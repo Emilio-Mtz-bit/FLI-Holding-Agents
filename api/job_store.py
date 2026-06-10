@@ -2,6 +2,8 @@ import threading
 import uuid
 from typing import Any
 
+# TODO: replace _store with Redis or a database for multi-worker deployments.
+# This in-process dict is invisible across Gunicorn worker processes.
 _store: dict[str, dict] = {}
 _lock = threading.Lock()
 
